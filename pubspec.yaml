@@ -1,0 +1,31 @@
+name: selvis_flutter
+description: Приложение для сайта selvis.com
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  path_provider: any
+  http: any
+  intl: any
+  barcode_scan: any
+  sentry: any
+  dotenv: any
+  shared_preferences: any
+  device_info: any
+  package_info: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+# The following section is specific to Flutter.
+flutter:
+  assets:
+    - .app_env
+  uses-material-design: true
