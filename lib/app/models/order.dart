@@ -30,7 +30,10 @@ class Order {
   Future<void> loadAdditionalData() async {
     Map<String, dynamic> res = await App.application.api.get(
       'orders/getLinesDataRange',
-      params: {'guid': guid, 'fetch': 10000}
+      params: {
+        'guid': guid,
+        'fetch': 10000
+      }
     );
     List<dynamic> tracking = res['tracking'];
 

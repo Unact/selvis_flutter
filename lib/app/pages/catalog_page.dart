@@ -20,6 +20,7 @@ class CatalogPage extends StatefulWidget {
 }
 
 class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
+  _CatalogPageDelegate _delegate = _CatalogPageDelegate();
   GlobalKey<ApiPageWidgetState> _apiWidgetKey = GlobalKey();
   List<Group> _groups = [];
 
@@ -28,16 +29,12 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.search),
-          onPressed: () async {
-            print('Implement me!');
-          },
+          onPressed: _searchProduct
         ),
         IconButton(
           color: Colors.white,
           icon: Icon(Icons.camera_alt),
-          onPressed: () {
-            _scanBarcode();
-          }
+          onPressed: _scanBarcode
         ),
       ],
       title: Text(App.application.config.packageInfo.appName)
@@ -56,8 +53,8 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
             children: <Widget>[
               SizedBox(
                 child: Image.network(App.application.config.apiBaseUrl + 'images/source/groups/${group.title}'),
-                height: 125,
-                width: 125
+                height: 112,
+                width: 112
               ),
               Text(
                 group.title,
@@ -76,13 +73,21 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
     _groups = topGroups.map((group) => group.childrenList).expand((el) => el).toList();
   }
 
+  void _searchProduct() async {
+    await showSearch<Product>(context: context, delegate: _delegate);
+  }
+
   void _scanBarcode() async {
     String errorMsg;
 
     try {
       Product product = await Product.loadByBarcode(await BarcodeScanner.scan());
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
+      if (product != null) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
+      } else {
+        errorMsg = 'Товар не найден';
+      }
     } on PlatformException catch (e) {
       errorMsg = 'Не известная ошибка: $e';
 
@@ -106,5 +111,72 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       buildBody: _buildBody,
       loadData: _loadData,
     );
+  }
+}
+
+
+class _CatalogPageDelegate extends SearchDelegate<Product> {
+  List<Product> _products;
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      tooltip: 'Назад',
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Container();
+  }
+
+  Future<void> _loadSuggestions() async {
+    String searchStr = query.toLowerCase();
+    if (searchStr != '') {
+      _products = await Product.loadByName(searchStr);
+    }
+  }
+
+  void _reset() {
+    query = '';
+    _products = null;
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    _loadSuggestions();
+
+    if (_products != null && _products.isEmpty) {
+      return Center(child: Text('Ничего не найдено', textAlign: TextAlign.center));
+    }
+
+    return ListView(
+      children: (_products ?? []).map((Product product) {
+        return ListTile(
+          leading: SizedBox(
+            child: product.image,
+            width: 48,
+            height: 52
+          ),
+          isThreeLine: false,
+          title: Text(product.wareName, style: Theme.of(context).textTheme.caption),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
+          }
+        );
+      }).toList()
+    );
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return <Widget>[query.isEmpty ? Container() : IconButton(icon: Icon(Icons.clear), onPressed: _reset)];
   }
 }

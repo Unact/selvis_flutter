@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'package:selvis_flutter/app/app.dart';
 
 class Product {
@@ -13,6 +15,7 @@ class Product {
   List<dynamic> specs;
 
   double get sum => price * quantity;
+  Image get image => Image.network(App.application.config.apiBaseUrl + 'images/$productGuid.png');
 
   Product(Map<String, dynamic> values) {
     skuGuid = values['skuGuid'];
@@ -28,22 +31,24 @@ class Product {
   }
 
   static Future<List<Product>> loadByGroup3(String group3) async {
-    List<dynamic> res = (
-      await App.application.api.get('orderEditor/getDataRange', params: {'group3': group3, 'fetch': 10000})
+    List<dynamic> res = (await App.application.api.get(
+      'orderEditor/getDataRange',
+      params: {
+        'group3': group3,
+        'fetch': 10000
+      })
     )['list'];
     return res.map<Product>((row) => Product(row)).toList();
   }
 
   static Future<List<Product>> loadOrdered(String draftGuid) async {
-    List<dynamic> res = (
-      await App.application.api.get(
-        'orderEditor/getDataRange',
-        params: {
-          'guid': draftGuid,
-          'fetch': 10000,
-          'orderedOnly': true
-        }
-      )
+    List<dynamic> res = (await App.application.api.get(
+      'orderEditor/getDataRange',
+      params: {
+        'guid': draftGuid,
+        'fetch': 10000,
+        'orderedOnly': true
+      })
     )['list'];
 
     return res.map<Product>((row) => Product(row)).toList();
@@ -55,6 +60,18 @@ class Product {
     )['line'];
 
     return Product(res);
+  }
+
+  static Future<List<Product>> loadByName(String name) async {
+    List<dynamic> res = (await App.application.api.get(
+      'orderEditor/getDataRange',
+      params: {
+        'search': name,
+        'fetch': 10000
+      })
+    )['list'];
+
+    return res.map<Product>((row) => Product(row)).toList();
   }
 
   Future<void> loadAdditionalData() async {
