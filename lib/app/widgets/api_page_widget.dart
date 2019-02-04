@@ -9,9 +9,9 @@ class ApiPageWidget extends StatefulWidget {
 
   ApiPageWidget({
     Key key,
+    @required this.buildAppBar,
     @required this.buildBody,
-    @required this.loadData,
-    @required this.buildAppBar
+    this.loadData,
   }) : super(key: key);
 
   @override
@@ -19,6 +19,7 @@ class ApiPageWidget extends StatefulWidget {
 }
 
 class ApiPageWidgetState extends State<ApiPageWidget> with WidgetsBindingObserver {
+  static const _kRefreshWaitMs = 200;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
@@ -28,7 +29,7 @@ class ApiPageWidgetState extends State<ApiPageWidget> with WidgetsBindingObserve
 
   Future<void> _loadData() async {
     try {
-      await widget.loadData();
+      await widget?.loadData();
     } on ApiException catch(e) {
       _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(e.errorMsg)));
     }
@@ -41,7 +42,12 @@ class ApiPageWidgetState extends State<ApiPageWidget> with WidgetsBindingObserve
   @override
   void initState() {
     super.initState();
-    _loadData();
+
+    Future.delayed(Duration(milliseconds: _kRefreshWaitMs)).then((_) {
+      if (widget.loadData != null) {
+        _refreshIndicatorKey.currentState?.show();
+      }
+    });
   }
 
   @override

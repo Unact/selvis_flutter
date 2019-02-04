@@ -37,14 +37,12 @@ class _SubGroupsPageState extends State<SubGroupsPage> {
     );
   }
 
-  void _loadData() {}
 
   @override
   Widget build(BuildContext context) {
     return ApiPageWidget(
       buildAppBar: _buildAppBar,
       buildBody: _buildBody,
-      loadData: _loadData,
     );
   }
 }
