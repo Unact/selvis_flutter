@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/user.dart';
+import 'package:selvis_flutter/app/pages/orders_page.dart';
+import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
 class UserPage extends StatefulWidget {
-
   UserPage({Key key}) : super(key: key);
 
   @override
@@ -15,11 +16,14 @@ class _UserPageState extends State<UserPage> {
   String _login;
   String _password;
 
-  Widget _buildBody(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(left: 8.0, right: 8.0),
-      child: User.currentUser().isLogged() ? _buildProfileForm(context) : _buildLoginForm(context)
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Text('Профиль'),
     );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    return User.currentUser().isLogged() ? _buildProfileForm(context) : _buildLoginForm(context);
   }
 
   Widget _buildLoginForm(BuildContext context) {
@@ -77,9 +81,9 @@ class _UserPageState extends State<UserPage> {
         Text('Logged'),
         RaisedButton(
           onPressed: () async {
-            print('Implement me!');
+            Navigator.push(context, MaterialPageRoute(builder: (context) => OrdersPage()));
           },
-          child: Text('История'),
+          child: Text('Список заказов'),
         ),
         Container(
           width: 80.0,
@@ -100,13 +104,16 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
+  Future<void> _loadData() async {
+    print('Implement me!');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Профиль'),
-      ),
-      body: _buildBody(context)
+    return ApiPageWidget(
+      buildAppBar: _buildAppBar,
+      buildBody: _buildBody,
+      loadData: _loadData,
     );
   }
 }

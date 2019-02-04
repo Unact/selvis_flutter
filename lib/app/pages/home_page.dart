@@ -12,13 +12,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final GlobalKey _bottomNavigationBarKey = GlobalKey();
   int _currentIndex = 0;
   List<Widget> _children = [];
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return BottomNavigationBar(
-      key: _bottomNavigationBarKey,
       currentIndex: _currentIndex,
       onTap: (int index) => setState(() => _currentIndex = index),
       items: [
@@ -44,8 +42,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-
     super.initState();
+
     _children = [
       CatalogPage(),
       CartPage(),

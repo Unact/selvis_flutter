@@ -72,11 +72,15 @@ class Api {
       final int statusCode = response.statusCode;
       final String body = response.body;
 
+      print(statusCode);
       if (statusCode >= 500) {
         throw ServerException(statusCode);
       }
 
       if (statusCode >= 400 || statusCode < 200) {
+        if (statusCode == 403) {
+          throw ApiException('Необходимо заново войти в приложение', statusCode);
+        }
         throw ApiException('Ошибка при получении данных', statusCode);
       }
 

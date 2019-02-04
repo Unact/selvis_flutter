@@ -7,8 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/group.dart';
 import 'package:selvis_flutter/app/models/product.dart';
+import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/pages/sub_groups_page.dart';
 import 'package:selvis_flutter/app/pages/product_page.dart';
+import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
 class CatalogPage extends StatefulWidget {
   CatalogPage({Key key}) : super(key: key);
@@ -18,105 +20,91 @@ class CatalogPage extends StatefulWidget {
 }
 
 class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  List<Group> groups = [];
+  GlobalKey<ApiPageWidgetState> _apiWidgetKey = GlobalKey();
+  List<Group> _groups = [];
 
-  Widget _buildBody(BuildContext context) {
-    return RefreshIndicator(
-      key: _refreshIndicatorKey,
-      onRefresh: _loadData,
-      child: GridView.count(
-        crossAxisCount: 2,
-        children: groups.map((Group group) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => SubGroupsPage(parentGroup: group)));
-            },
-            child: Column(
-              children: <Widget>[
-                SizedBox(child: Image.network(App.application.config.apiBaseUrl + 'images/source/groups/${group.title}'),
-                  height: 125,
-                  width: 125
-                ),
-                Text(group.title,
-                  style: Theme.of(context).textTheme.subtitle,
-                  textAlign: TextAlign.center
-                )
-              ]
-            )
-          );
-        }).toList()
-      )
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () async {
+            print('Implement me!');
+          },
+        ),
+        IconButton(
+          color: Colors.white,
+          icon: Icon(Icons.camera_alt),
+          onPressed: () {
+            _scanBarcode();
+          }
+        ),
+      ],
+      title: Text(App.application.config.packageInfo.appName)
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
+  Widget _buildBody(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 2,
+      children: _groups.map((Group group) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SubGroupsPage(parentGroup: group)));
+          },
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                child: Image.network(App.application.config.apiBaseUrl + 'images/source/groups/${group.title}'),
+                height: 125,
+                width: 125
+              ),
+              Text(
+                group.title,
+                style: Theme.of(context).textTheme.subtitle,
+                textAlign: TextAlign.center
+              )
+            ]
+          )
+        );
+      }).toList()
+    );
   }
 
   Future<void> _loadData() async {
     List<Group> topGroups = await Group.loadFromRemote();
-    groups = topGroups.map((group) => group.childrenList).expand((el) => el).toList();
-
-    if (mounted) {
-      setState(() {});
-    }
+    _groups = topGroups.map((group) => group.childrenList).expand((el) => el).toList();
   }
 
   void _scanBarcode() async {
+    String errorMsg;
+
     try {
       Product product = await Product.loadByBarcode(await BarcodeScanner.scan());
 
       Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
     } on PlatformException catch (e) {
-      String errorMsg = 'Не известная ошибка: $e';
+      errorMsg = 'Не известная ошибка: $e';
 
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         errorMsg = 'Необходимо дать доступ к использованию камеры';
       }
+    } on ApiException catch (e) {
+      errorMsg = e.errorMsg;
+    }
 
-      showDialog(context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Ошибка сканирования'),
-            content: Text(errorMsg),
-          );
-        }
-      );
+    if (errorMsg != null) {
+      _apiWidgetKey.currentState?.showMessage(errorMsg);
     }
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _refreshIndicatorKey.currentState?.show();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () async {
-
-            },
-          ),
-          IconButton(
-            color: Colors.white,
-            icon: Icon(Icons.camera_alt),
-            onPressed: () {
-              _scanBarcode();
-            }
-          ),
-        ],
-        title: Text(App.application.config.packageInfo.appName)
-      ),
-      body: _buildBody(context)
+    return ApiPageWidget(
+      key: _apiWidgetKey,
+      buildAppBar: _buildAppBar,
+      buildBody: _buildBody,
+      loadData: _loadData,
     );
   }
 }

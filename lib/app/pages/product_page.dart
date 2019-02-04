@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/models/user.dart';
+import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
 class ProductPage extends StatefulWidget {
   final Product product;
@@ -14,10 +15,15 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Text('Товар'),
+    );
+  }
 
   Widget _buildBody(BuildContext context) {
     return ListView(
-      padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+      padding: EdgeInsets.only(top: 8.0),
       children: [
         Column(
           children: <Widget>[
@@ -60,27 +66,16 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
   Future<void> _loadData() async {
     await widget.product.loadInfo();
-
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Товар'),
-      ),
-      body: _buildBody(context)
+    return ApiPageWidget(
+      buildAppBar: _buildAppBar,
+      buildBody: _buildBody,
+      loadData: _loadData,
     );
   }
 }
