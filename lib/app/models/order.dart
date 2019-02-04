@@ -32,11 +32,11 @@ class Order {
       'orders/getLinesDataRange',
       params: {'guid': guid, 'fetch': 10000}
     );
-    Map<String, String> tracking = res['tracking'];
+    List<dynamic> tracking = res['tracking'];
 
-    if (tracking != null) {
-      trackingMessage = res['tracking']['message'];
-      trackingTimestamp = res['tracking']['timestamp'];
+    if (tracking != null && tracking.isNotEmpty) {
+      trackingMessage = tracking.first['message'];
+      trackingTimestamp = Nullify.parseDate(tracking.first['timestamp']);
     }
     statusName = res['order']['statusName'];
     orderLines = res['list'].map<OrderLine>((row) => OrderLine(row)).toList();
