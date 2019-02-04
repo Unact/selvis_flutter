@@ -27,7 +27,7 @@ class Order {
     return res.map<Order>((row) => Order(row)).toList();
   }
 
-  Future<void> loadInfo() async {
+  Future<void> loadAdditionalData() async {
     Map<String, dynamic> res = await App.application.api.get(
       'orders/getLinesDataRange',
       params: {'guid': guid, 'fetch': 10000}

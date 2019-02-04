@@ -44,7 +44,7 @@ class _OrderLinesPageState extends State<OrderLinesPage> {
   }
 
   Future<void> _loadData() async {
-    await widget.order.loadInfo();
+    await widget.order.loadAdditionalData();
   }
 
   @override

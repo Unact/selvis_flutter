@@ -67,7 +67,7 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Future<void> _loadData() async {
-    await widget.product.loadInfo();
+    await widget.product.loadAdditionalData();
   }
 
   @override

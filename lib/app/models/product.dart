@@ -57,7 +57,7 @@ class Product {
     return Product(res);
   }
 
-  Future<void> loadInfo() async {
+  Future<void> loadAdditionalData() async {
     Map<String, dynamic> res = await App.application.api.get('orderEditor/getSkuSpec', params: {'skuGuid': skuGuid});
 
     specs = res['specs'];
