@@ -16,7 +16,7 @@ class Sentry {
     );
 
     FlutterError.onError = (FlutterErrorDetails errorDetails) async {
-      User user = User.currentUser();
+      User user = User.currentUser;
       sentryLib.Event event = sentryLib.Event(
         exception: errorDetails.exception,
         stackTrace: errorDetails.stack,

@@ -1,7 +1,9 @@
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/user.dart';
+import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/pages/orders_page.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
@@ -13,6 +15,7 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
+  GlobalKey<ApiPageWidgetState> _apiWidgetKey = GlobalKey();
   String _login;
   String _password;
 
@@ -23,7 +26,7 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return User.currentUser().isLogged() ? _buildProfileForm(context) : _buildLoginForm(context);
+    return User.currentUser.isLoggedIn ? _buildProfileForm(context) : _buildLoginForm(context);
   }
 
   Widget _buildLoginForm(BuildContext context) {
@@ -34,7 +37,7 @@ class _UserPageState extends State<UserPage> {
       children: <Widget>[
         TextField(
           onChanged: (val) => _login = val,
-          keyboardType: TextInputType.phone,
+          keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: 'Телефон или e-mail',
           ),
@@ -47,38 +50,61 @@ class _UserPageState extends State<UserPage> {
             labelText: 'Пароль'
           ),
         ),
-        Container(
-          width: 80.0,
-          child: RaisedButton(
-            onPressed: () async {
-              dynamic res = (await App.application.api.post(
-                'login/login',
-                params: {'login': _login, 'password': _password, 'rememberme': 'on'}
-              ))['user'];
-              User user = User.currentUser();
-
-              user.uid = res['uid'];
-              user.password = _password;
-              user.login = _login;
-              await user.save();
-
-              setState(() {});
-            },
-            color: Colors.blueGrey,
-            textColor: Colors.white,
-            child: Text('Войти'),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              onPressed: () async {
+                try {
+                  await User.currentUser.apiLoginWithCredentials(_login, _password);
+                  setState(() {});
+                } on ApiException catch(e) {
+                  _apiWidgetKey.currentState?.showMessage(e.errorMsg);
+                }
+              },
+              color: Colors.blueGrey,
+              textColor: Colors.white,
+              child: Text('Войти'),
+            ),
+            SizedBox(width: 10,),
+            RaisedButton(
+              onPressed: _qrLogin,
+              color: Colors.blueGrey,
+              textColor: Colors.white,
+              child: Text('QR'),
+            ),
+          ]
         )
       ]
     );
   }
 
+  void _qrLogin() async {
+    String errorMsg;
+
+    try {
+      await User.currentUser.apiLoginWithQrCode(await BarcodeScanner.scan());
+      setState(() {});
+    } on PlatformException catch (e) {
+      errorMsg = 'Не известная ошибка: $e';
+
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        errorMsg = 'Необходимо дать доступ к использованию камеры';
+      }
+    } on ApiException catch (e) {
+      errorMsg = e.errorMsg;
+    }
+
+    if (errorMsg != null) {
+      _apiWidgetKey.currentState?.showMessage(errorMsg);
+    }
+  }
+
   Widget _buildProfileForm(BuildContext context) {
-    User user = User.currentUser();
+    User user = User.currentUser;
 
     return Column(
       children: <Widget>[
-        Text('Logged'),
         RaisedButton(
           onPressed: () async {
             Navigator.push(context, MaterialPageRoute(builder: (context) => OrdersPage()));
@@ -89,11 +115,12 @@ class _UserPageState extends State<UserPage> {
           width: 80.0,
           child: RaisedButton(
             onPressed: () async {
-              await App.application.api.post('login/logout');
-              user.reset();
-              await user.save();
-
-              setState(() {});
+              try {
+                await user.apiLogout();
+                setState(() {});
+              } on ApiException catch(e) {
+                _apiWidgetKey.currentState?.showMessage(e.errorMsg);
+              }
             },
             color: Colors.blueGrey,
             textColor: Colors.white,
@@ -111,6 +138,7 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return ApiPageWidget(
+      key: _apiWidgetKey,
       buildAppBar: _buildAppBar,
       buildBody: _buildBody,
       loadData: _loadData,

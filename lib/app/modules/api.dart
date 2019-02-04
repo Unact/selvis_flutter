@@ -72,7 +72,6 @@ class Api {
       final int statusCode = response.statusCode;
       final String body = response.body;
 
-      print(statusCode);
       if (statusCode >= 500) {
         throw ServerException(statusCode);
       }
@@ -84,20 +83,27 @@ class Api {
         throw ApiException('Ошибка при получении данных', statusCode);
       }
 
+      Map<String, dynamic> parsedBody = body.isEmpty ? Map<String, dynamic>() : _decoder.convert(body);
+
+      if (parsedBody['status'] != 'OK') {
+        throw ApiException(parsedBody['message'], statusCode);
+      }
+
       await _updateCookie(response);
 
-      return body.isEmpty ? Map<String, dynamic>() : _decoder.convert(body)['result'];
+      return parsedBody['result'];
   }
 
    Future<void> _updateCookie(http.Response response) async {
     String allSetCookie = response.headers['set-cookie'];
-    User user = User.currentUser();
+    User user = User.currentUser;
 
     String newDraft = _findInCookieList(allSetCookie, 'anon-draft');
     if (newDraft != 'null') {
       user.lastDraft = _findInCookieList(allSetCookie, 'anon-draft') ?? user.lastDraft;
     }
     user.sessionId = _findInCookieList(allSetCookie, 'JSESSIONID') ?? user.sessionId;
+    user.refreshToken = _findInCookieList(allSetCookie, 'remme') ?? user.refreshToken;
     await user.save();
   }
 
@@ -128,9 +134,9 @@ class Api {
   }
 
   String _generateCookieHeader() {
-    User user = User.currentUser();
+    User user = User.currentUser;
 
-    return 'JSESSIONID=${user.sessionId};anon-draft=${user.lastDraft}';
+    return 'JSESSIONID=${user.sessionId};anon-draft=${user.lastDraft};remme=${user.refreshToken}';
   }
 }
 

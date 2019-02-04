@@ -58,7 +58,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<void> _loadData() async {
-    _products = await Product.loadOrdered(User.currentUser().lastDraft);
+    _products = await Product.loadOrdered(User.currentUser.lastDraft);
   }
 
   @override

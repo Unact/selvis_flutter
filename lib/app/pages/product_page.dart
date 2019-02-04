@@ -43,7 +43,7 @@ class _ProductPageState extends State<ProductPage> {
                   onPressed: () async {
                     int newQuantity = widget.product.quantity - widget.product.multiple;
 
-                    await widget.product.changeQuantity(newQuantity, User.currentUser().lastDraft);
+                    await widget.product.changeQuantity(newQuantity, User.currentUser.lastDraft);
                     setState((){});
                   },
                 ),
@@ -53,7 +53,7 @@ class _ProductPageState extends State<ProductPage> {
                   onPressed: () async {
                     int newQuantity = widget.product.quantity + widget.product.multiple;
 
-                    await widget.product.changeQuantity(newQuantity, User.currentUser().lastDraft);
+                    await widget.product.changeQuantity(newQuantity, User.currentUser.lastDraft);
                     setState((){});
                   },
                 )

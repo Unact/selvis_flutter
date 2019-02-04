@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/modules/sentry.dart';
 import 'package:selvis_flutter/app/pages/home_page.dart';
@@ -30,6 +31,7 @@ class App {
   Future<void> run() async {
     prefs = await SharedPreferences.getInstance();
     widget = _buildWidget();
+    User.init();
 
     print('Started $name in ${config.env} environment');
     runApp(widget);
