@@ -1,4 +1,4 @@
-import 'package:selvis_flutter/app/app.dart';
+import 'package:selvis_flutter/app/modules/api.dart';
 
 class Group {
   int id;
@@ -14,7 +14,7 @@ class Group {
   }
 
   static Future<List<Group>> loadFromRemote() async {
-    List<dynamic> res = await App.application.api.get('orderEditor/groups');
+    List<dynamic> res = await Api.get('orderEditor/groups');
     return res.map<Group>((row) => Group(row)).toList();
   }
 }

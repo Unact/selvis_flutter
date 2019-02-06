@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:selvis_flutter/app/app.dart';
+import 'package:selvis_flutter/app/modules/api.dart';
 
 class User {
   User.init() {
@@ -41,7 +42,7 @@ class User {
   bool get isLoggedIn => refreshToken != null;
 
   Future<void> apiLogin(Map<String, String> params) async {
-    Map<String, dynamic> res = await App.application.api.post('login/login', params: params);
+    Map<String, dynamic> res = await Api.post('login/login', params: params);
 
     firstname = res['firstname'];
     lastname = res['lastname'];
@@ -65,18 +66,18 @@ class User {
   }
 
   Future<void> apiLogout() async {
-    await App.application.api.post('login/logout');
+    await Api.post('login/logout');
     reset();
     await newDraft();
     await save();
   }
 
   Future<void> newDraft() async {
-    lastDraft = await App.application.api.post('orderEditor/newOrder');
+    lastDraft = await Api.post('orderEditor/newOrder');
   }
 
   Future<void> loadAdditionalData() async {
-    Map<String, dynamic> res = await App.application.api.get('user-profile/getProfile');
+    Map<String, dynamic> res = await Api.get('user-profile/getProfile');
 
     firstname = res['firstname'];
     lastname = res['lastname'];
@@ -86,7 +87,7 @@ class User {
   }
 
   Future<void> changeAdditionalData() async {
-    await App.application.api.post(
+    await Api.post(
       'user-profile/setProfile',
       params: {
         'firstname': firstname,

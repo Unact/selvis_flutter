@@ -6,20 +6,17 @@ import 'package:http/http.dart' as http;
 
 import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/user.dart';
-import 'package:selvis_flutter/config/app_config.dart';
 
 class Api {
-  Api(AppConfig config);
+  static final JsonDecoder _decoder = JsonDecoder();
+  static final JsonEncoder _encoder = JsonEncoder();
+  static final httpClient = http.Client();
 
-  final JsonDecoder _decoder = JsonDecoder();
-  final JsonEncoder _encoder = JsonEncoder();
-  final httpClient = http.Client();
-
-  String _writeParam(String key, String value) {
+  static String _writeParam(String key, String value) {
     return Uri.encodeQueryComponent(key) + '=' + Uri.encodeQueryComponent(value);
   }
 
-  Future<dynamic> _sendRawRequest(
+  static Future<dynamic> _sendRawRequest(
     String httpMethod,
     String apiMethod,
     Map<String, dynamic> params,
@@ -40,8 +37,8 @@ class Api {
     });
 
     try {
-      print('API: $httpMethod - $url');
-      return await parseResponse(await http.Response.fromStream(await httpClient.send(request)));
+      print('API: Started $httpMethod - $url');
+      return await _parseResponse(await http.Response.fromStream(await httpClient.send(request)));
     } catch(e) {
       if (e is SocketException || e is http.ClientException || e is HandshakeException) {
         throw ApiConnException();
@@ -51,7 +48,7 @@ class Api {
     }
   }
 
-  Future<dynamic> _sendRequest(
+  static Future<dynamic> _sendRequest(
     String httpMethod,
     String apiMethod,
     Map<String, dynamic> params,
@@ -60,18 +57,19 @@ class Api {
     return await _sendRawRequest(httpMethod, apiMethod, params, body);
   }
 
-  Future<dynamic> get(String method, {Map<String, dynamic> params}) async {
+  static Future<dynamic> get(String method, {Map<String, dynamic> params}) async {
     return await _sendRequest('GET', method, params ?? {}, '');
   }
 
-  Future<dynamic> post(String method, {Map<String, dynamic> params, body}) async {
+  static Future<dynamic> post(String method, {Map<String, dynamic> params, body}) async {
     return await _sendRequest('POST', method, params ?? {}, _encoder.convert(body));
   }
 
-  dynamic parseResponse(http.Response response) async {
-      final int statusCode = response.statusCode;
-      final String body = response.body;
+  static Future<dynamic> _parseResponse(http.Response response) async {
+      int statusCode = response.statusCode;
+      String body = response.body;
 
+      print('API: Completed ${response.request.method} - ${response.request.url} - $statusCode');
       if (statusCode >= 500) {
         throw ServerException(statusCode);
       }
@@ -94,7 +92,7 @@ class Api {
       return parsedBody['result'];
   }
 
-   Future<void> _updateCookie(http.Response response) async {
+  static Future<void> _updateCookie(http.Response response) async {
     String allSetCookie = response.headers['set-cookie'];
     User user = User.currentUser;
 
@@ -107,7 +105,7 @@ class Api {
     await user.save();
   }
 
-  String _findInCookieList(String allSetCookie, String cookieKey) {
+  static String _findInCookieList(String allSetCookie, String cookieKey) {
     if (allSetCookie != null) {
       List<String> setCookies = allSetCookie.split(',');
 
@@ -133,7 +131,7 @@ class Api {
     return null;
   }
 
-  String _generateCookieHeader() {
+  static String _generateCookieHeader() {
     User user = User.currentUser;
 
     return 'JSESSIONID=${user.sessionId};anon-draft=${user.lastDraft};remme=${user.refreshToken}';

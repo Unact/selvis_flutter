@@ -1,4 +1,4 @@
-import 'package:selvis_flutter/app/app.dart';
+import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/models/order_line.dart';
 import 'package:selvis_flutter/app/utils/nullify.dart';
 
@@ -22,13 +22,13 @@ class Order {
   }
 
   static Future<List<Order>> loadHistory() async {
-    List<dynamic> res = (await App.application.api.get('orders/getDataRange', params: {'fetch': 10000}))['list'];
+    List<dynamic> res = (await Api.get('orders/getDataRange', params: {'fetch': 10000}))['list'];
 
     return res.map<Order>((row) => Order(row)).toList();
   }
 
   Future<void> loadAdditionalData() async {
-    Map<String, dynamic> res = await App.application.api.get(
+    Map<String, dynamic> res = await Api.get(
       'orders/getLinesDataRange',
       params: {
         'guid': guid,

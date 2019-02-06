@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/app.dart';
+import 'package:selvis_flutter/app/modules/api.dart';
 
 class Product {
   String skuGuid;
@@ -31,7 +32,7 @@ class Product {
   }
 
   static Future<List<Product>> loadByGroup3(String group3) async {
-    List<dynamic> res = (await App.application.api.get(
+    List<dynamic> res = (await Api.get(
       'orderEditor/getDataRange',
       params: {
         'group3': group3,
@@ -42,7 +43,7 @@ class Product {
   }
 
   static Future<List<Product>> loadOrdered(String draftGuid) async {
-    List<dynamic> res = (await App.application.api.get(
+    List<dynamic> res = (await Api.get(
       'orderEditor/getDataRange',
       params: {
         'guid': draftGuid,
@@ -56,14 +57,14 @@ class Product {
 
   static Future<Product> loadByBarcode(String barcode) async {
     Map<String, dynamic> res = (
-      await App.application.api.get('orderEditor/getSkuSpec', params: {'barcode': barcode})
+      await Api.get('orderEditor/getSkuSpec', params: {'barcode': barcode})
     )['line'];
 
     return Product(res);
   }
 
   static Future<List<Product>> loadByName(String name) async {
-    List<dynamic> res = (await App.application.api.get(
+    List<dynamic> res = (await Api.get(
       'orderEditor/getDataRange',
       params: {
         'search': name,
@@ -75,7 +76,7 @@ class Product {
   }
 
   Future<void> loadAdditionalData() async {
-    Map<String, dynamic> res = await App.application.api.get('orderEditor/getSkuSpec', params: {'skuGuid': skuGuid});
+    Map<String, dynamic> res = await Api.get('orderEditor/getSkuSpec', params: {'skuGuid': skuGuid});
 
     specs = res['specs'];
     vat = res['vat'];
@@ -86,7 +87,7 @@ class Product {
 
     if (sendQuantity != quantity) {
       quantity = sendQuantity;
-      await App.application.api.post(
+      await Api.post(
         'orderEditor/manageLine',
         params: {
           'quantity': sendQuantity,

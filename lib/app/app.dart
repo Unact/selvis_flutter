@@ -5,15 +5,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:selvis_flutter/app/models/user.dart';
-import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/modules/sentry.dart';
 import 'package:selvis_flutter/app/pages/home_page.dart';
 import 'package:selvis_flutter/config/app_config.dart';
 
 class App {
-  App.setup(this.config) :
-    api = Api(config)
-  {
+  App.setup(this.config) {
     _setupEnv();
     _application = this;
   }
@@ -23,7 +20,6 @@ class App {
   final String name = 'selvis_flutter';
   final String title = 'Selvis';
   final AppConfig config;
-  final Api api;
   Sentry sentry;
   Widget widget;
   SharedPreferences prefs;
