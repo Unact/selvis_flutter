@@ -22,23 +22,41 @@ class _OrderLinesPageState extends State<OrderLinesPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Column(
+    return ListView(
+      padding: EdgeInsets.only(top: 8.0),
       children: <Widget>[
-        Text('Адрес доставки: ${widget.order.shipAddress}'),
-        Text('Дата доставки: ${DateFormat.yMMMMd('ru').format(widget.order.deliveryDate)}'),
-        Text('Состояние заказа: ${widget.order.statusName}'),
-        Text('Итого: ${widget.order.total}'),
-        Expanded(
-          child: ListView(
-            children: widget.order.orderLines.map((OrderLine orderLine) {
-              return ListTile(
-                title: Text(orderLine.name, style: Theme.of(context).textTheme.caption),
-                subtitle: Text('${orderLine.quantity} X ${orderLine.price}'),
-                trailing: Text(orderLine.sum.toString())
-              );
-            }).toList()
-          )
+        Table(
+          columnWidths: <int, TableColumnWidth>{
+            0: FixedColumnWidth(132.0)
+          },
+          children: <TableRow>[
+            _buildTableRow(context, 'Адрес доставки', widget.order.shipAddress),
+            _buildTableRow(context, 'Дата доставки', DateFormat.yMMMMd('ru').format(widget.order.deliveryDate)),
+            _buildTableRow(context, 'Состояние заказа', widget.order.statusName?.toString() ?? 'Не определен'),
+            _buildTableRow(context, 'Итого', widget.order.total.toStringAsFixed(2)),
+          ]
         )
+      ]..addAll(widget.order.orderLines.map((OrderLine orderLine) {
+        return ListTile(
+          title: Text(orderLine.name, style: Theme.of(context).textTheme.caption),
+          subtitle: Text('${orderLine.quantity} X ${orderLine.price}'),
+          trailing: Text(orderLine.sum.toString())
+        );
+      }).toList())
+    );
+  }
+
+  TableRow _buildTableRow(BuildContext context, String key, String value) {
+    return TableRow(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 4.0, right: 8.0),
+          child: Text(key, style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.end)
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+          child: Text(value, style: TextStyle(fontSize: 14.0, color: Colors.black)),
+        ),
       ]
     );
   }
