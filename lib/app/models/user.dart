@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:selvis_flutter/app/app.dart';
+import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 
 class User {
@@ -43,12 +44,19 @@ class User {
 
   Future<void> apiLogin(Map<String, String> params) async {
     Map<String, dynamic> res = await Api.post('login/login', params: params);
+    Map<String, dynamic> userData = res['user'];
 
-    firstname = res['firstname'];
-    lastname = res['lastname'];
-    middlename = res['middlename'];
-    phone = res['phone'];
-    email = res['email'];
+    if (userData != null) {
+      firstname = userData['firstname'];
+      lastname = userData['lastname'];
+      middlename = userData['middlename'];
+      phone = userData['phone'];
+      email = userData['email'];
+    }
+    if ((await Product.loadOrdered(User.currentUser.lastDraft)).isEmpty) {
+      await newDraft();
+    }
+
     await save();
   }
 
