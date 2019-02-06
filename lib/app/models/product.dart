@@ -15,9 +15,10 @@ class Product {
   double vat;
   int multiple;
   List<ProductSpec> productSpecs = [];
+  bool haveImage;
 
   double get sum => price * quantity;
-  Image get image => Image.network(App.application.config.apiBaseUrl + 'images/$productGuid.png');
+  Image get image => haveImage ? Image.network(App.application.config.apiBaseUrl + 'images/$productGuid.png') : null;
 
   Product(Map<String, dynamic> values) {
     skuGuid = values['skuGuid'];
@@ -29,6 +30,7 @@ class Product {
     quantity = values['quantity'] ?? 0;
     price = values['price'];
     multiple = values['multiples'].first['value'];
+    haveImage = values['haveImage'];
   }
 
   static Future<List<Product>> loadByGroup3(String group3) async {

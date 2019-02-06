@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/pages/product_page.dart';
@@ -38,11 +37,11 @@ class _CartPageState extends State<CartPage> {
                 },
                 title: Text(product.wareName, style: Theme.of(context).textTheme.caption),
                 leading: SizedBox(
-                  child: Image.network(App.application.config.apiBaseUrl + 'images/${product.productGuid}.png'),
+                  child: product.image,
                   width: 48,
                   height: 52
                 ),
-                subtitle: Text(product.sum.toString(), style: TextStyle(color: Colors.green)),
+                trailing: Text(product.sum.toStringAsFixed(2), style: TextStyle(color: Colors.green)),
               );
             }).toList()
           ),

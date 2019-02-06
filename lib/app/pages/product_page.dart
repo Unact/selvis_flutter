@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/models/product_spec.dart';
 import 'package:selvis_flutter/app/models/user.dart';
@@ -29,7 +28,7 @@ class _ProductPageState extends State<ProductPage> {
         Column(
           children: <Widget>[
             SizedBox(
-              child: Image.network(App.application.config.apiBaseUrl + 'images/${widget.product.productGuid}.png'),
+              child: widget.product.image,
               width: 260,
               height: 200
             ),
