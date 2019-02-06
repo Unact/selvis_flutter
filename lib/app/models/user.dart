@@ -84,6 +84,7 @@ class User {
     middlename = res['middlename'];
     phone = res['phone'];
     email = res['email'];
+    await User.currentUser.save();
   }
 
   Future<void> changeAdditionalData() async {

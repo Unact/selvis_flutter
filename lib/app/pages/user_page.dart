@@ -116,7 +116,7 @@ class _UserPageState extends State<UserPage> {
             enabled: true,
             maxLines: 1,
             keyboardType: TextInputType.text,
-            initialValue: value ?? '',
+            initialValue: value,
             style: TextStyle(fontSize: 14.0, color: Colors.black),
             decoration: InputDecoration(
               border: InputBorder.none,
