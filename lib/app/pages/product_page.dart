@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/product.dart';
+import 'package:selvis_flutter/app/models/product_spec.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
@@ -32,9 +33,21 @@ class _ProductPageState extends State<ProductPage> {
               width: 260,
               height: 200
             ),
-            Text(widget.product.wareName),
-            Text('НДС: ${widget.product.vat ?? ''}', textAlign: TextAlign.left,),
-            Text('Цена: ${widget.product.price ?? 0}'),
+            Table(
+              columnWidths: <int, TableColumnWidth>{
+                0: FixedColumnWidth(132.0)
+              },
+              children: <TableRow>[
+                _buildTableRow(context, 'Товар', widget.product.wareName),
+              ]..addAll(widget.product.productSpecs.map((ProductSpec spec) {
+                return _buildTableRow(context, spec.name, spec.value);
+              }))..addAll([
+                _buildTableRow(context, 'НДС', (widget.product.vat?.toStringAsFixed(0) ?? 'Не задан')),
+                _buildTableRow(context, 'Цена', widget.product.price.toString()),
+                _buildTableRow(context, 'Кол-во', widget.product.quantity.toStringAsFixed(0)),
+                _buildTableRow(context, 'Итого', widget.product.sum.toStringAsFixed(2)),
+              ])
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -47,7 +60,7 @@ class _ProductPageState extends State<ProductPage> {
                     setState((){});
                   },
                 ),
-                Text('${widget.product.quantity ?? 0}'),
+                SizedBox(width: 20),
                 RaisedButton(
                   child: Text('+${widget.product.multiple}'),
                   onPressed: () async {
@@ -59,9 +72,23 @@ class _ProductPageState extends State<ProductPage> {
                 )
               ]
             ),
-            Text('Итого: ${widget.product.sum}', textAlign: TextAlign.left,)
           ]
         )
+      ]
+    );
+  }
+
+  TableRow _buildTableRow(BuildContext context, String key, String value) {
+    return TableRow(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 4.0, right: 8.0),
+          child: Text(key, style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.end)
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+          child: Text(value, style: TextStyle(fontSize: 14.0, color: Colors.black)),
+        ),
       ]
     );
   }

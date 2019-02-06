@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/app.dart';
+import 'package:selvis_flutter/app/models/product_spec.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 
 class Product {
@@ -13,7 +14,7 @@ class Product {
   double price;
   double vat;
   int multiple;
-  List<dynamic> specs;
+  List<ProductSpec> productSpecs = [];
 
   double get sum => price * quantity;
   Image get image => Image.network(App.application.config.apiBaseUrl + 'images/$productGuid.png');
@@ -24,9 +25,8 @@ class Product {
     productCount = values['productCount'];
     wareName = values['wareName'];
     brand = values['brand'];
-    specs = values['specs'];
     vat = values['vat'];
-    quantity = values['quantity'];
+    quantity = values['quantity'] ?? 0;
     price = values['price'];
     multiple = values['multiples'].first['value'];
   }
@@ -78,7 +78,7 @@ class Product {
   Future<void> loadAdditionalData() async {
     Map<String, dynamic> res = await Api.get('orderEditor/getSkuSpec', params: {'skuGuid': skuGuid});
 
-    specs = res['specs'];
+    productSpecs = res['specs'].map<ProductSpec>((value) => ProductSpec(value)).toList();
     vat = res['vat'];
   }
 
