@@ -26,7 +26,10 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return User.currentUser.isLoggedIn ? _buildProfileForm(context) : _buildLoginForm(context);
+    return ListView(
+      children: <Widget>[User.currentUser.isLoggedIn ? _buildProfileForm(context) : _buildLoginForm(context)],
+    );
+
   }
 
   Widget _buildLoginForm(BuildContext context) {
@@ -100,11 +103,57 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
+  TableRow _buildTableRow(BuildContext context, String key, String value, Function onFieldSubmitted) {
+    return TableRow(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 4.0, right: 8.0),
+          child: Text(key, style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.end)
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+          child: TextFormField(
+            enabled: true,
+            maxLines: 1,
+            keyboardType: TextInputType.text,
+            initialValue: value ?? '',
+            style: TextStyle(fontSize: 14.0, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(),
+            ),
+            onFieldSubmitted: (String value) async {
+              try {
+                onFieldSubmitted(value);
+                await User.currentUser.changeAdditionalData();
+                setState(() {});
+              } on ApiException catch(e) {
+                _apiWidgetKey.currentState?.showMessage(e.errorMsg);
+              }
+            }
+          ),
+        ),
+      ]
+    );
+  }
+
   Widget _buildProfileForm(BuildContext context) {
     User user = User.currentUser;
 
     return Column(
       children: <Widget>[
+        Table(
+          columnWidths: <int, TableColumnWidth>{
+            0: FixedColumnWidth(88.0)
+          },
+          children: <TableRow>[
+            _buildTableRow(context, 'Фамилия', user.lastname, (String value) => user.lastname = value),
+            _buildTableRow(context, 'Имя', user.firstname, (String value) => user.firstname = value),
+            _buildTableRow(context, 'Отчество', user.middlename, (String value) => user.middlename = value),
+            _buildTableRow(context, 'Эл. почта', user.email, (String value) => user.email = value),
+            _buildTableRow(context, 'Телефон', user.phone, (String value) => user.phone = value)
+          ]
+        ),
         RaisedButton(
           onPressed: () async {
             Navigator.push(context, MaterialPageRoute(builder: (context) => OrdersPage()));
@@ -132,7 +181,9 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future<void> _loadData() async {
-    print('Implement me!');
+    if (User.currentUser.isLoggedIn) {
+      await User.currentUser.loadAdditionalData();
+    }
   }
 
   @override

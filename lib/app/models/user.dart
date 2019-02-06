@@ -9,8 +9,6 @@ class User {
   User.init() {
     _currentUser = this;
     uid = App.application.prefs.getString('uid') ?? kGuestUid;
-    login = App.application.prefs.getString('login');
-    password = App.application.prefs.getString('password');
     lastDraft = App.application.prefs.getString('lastDraft');
     sessionId = App.application.prefs.getString('sessionId');
     refreshToken = App.application.prefs.getString('refreshToken');
@@ -29,8 +27,6 @@ class User {
   static const String kGuestUid = 'guest';
 
   String uid;
-  String login;
-  String password;
   String lastDraft;
   String sessionId;
   String refreshToken;
@@ -47,13 +43,11 @@ class User {
   Future<void> apiLogin(Map<String, String> params) async {
     Map<String, dynamic> res = await App.application.api.post('login/login', params: params);
 
-    this.login = login;
-    this.password = password;
-    this.firstname = res['firstname'];
-    this.lastname = res['lastname'];
-    this.middlename = res['middlename'];
-    this.phone = res['phone'];
-    this.email = res['email'];
+    firstname = res['firstname'];
+    lastname = res['lastname'];
+    middlename = res['middlename'];
+    phone = res['phone'];
+    email = res['email'];
     await save();
   }
 
@@ -73,14 +67,40 @@ class User {
   Future<void> apiLogout() async {
     await App.application.api.post('login/logout');
     reset();
-
+    await newDraft();
     await save();
+  }
+
+  Future<void> newDraft() async {
+    lastDraft = await App.application.api.post('orderEditor/newOrder');
+  }
+
+  Future<void> loadAdditionalData() async {
+    Map<String, dynamic> res = await App.application.api.get('user-profile/getProfile');
+
+    firstname = res['firstname'];
+    lastname = res['lastname'];
+    middlename = res['middlename'];
+    phone = res['phone'];
+    email = res['email'];
+  }
+
+  Future<void> changeAdditionalData() async {
+    await App.application.api.post(
+      'user-profile/setProfile',
+      params: {
+        'firstname': firstname,
+        'lastname': lastname,
+        'middlename': middlename,
+        'phone': phone,
+        'email': email
+      }
+    );
+    await User.currentUser.save();
   }
 
   void reset() {
     uid = kGuestUid;
-    login = null;
-    password = null;
     lastDraft = null;
     sessionId = null;
     refreshToken = null;
@@ -95,8 +115,6 @@ class User {
     SharedPreferences prefs = App.application.prefs;
 
     await (uid != null ? prefs.setString('uid', uid) : prefs.remove('uid'));
-    await (login != null ? prefs.setString('login', login) : prefs.remove('login'));
-    await (password != null ? prefs.setString('password', password) : prefs.remove('password'));
     await (lastDraft != null ? prefs.setString('lastDraft', lastDraft) : prefs.remove('lastDraft'));
     await (sessionId != null ? prefs.setString('sessionId', sessionId) : prefs.remove('sessionId'));
     await (refreshToken != null ? prefs.setString('refreshToken', refreshToken) : prefs.remove('refreshToken'));
