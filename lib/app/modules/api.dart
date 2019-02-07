@@ -10,7 +10,10 @@ import 'package:selvis_flutter/app/models/user.dart';
 class Api {
   static final JsonDecoder _decoder = JsonDecoder();
   static final JsonEncoder _encoder = JsonEncoder();
-  static final httpClient = http.Client();
+  static final http.Client httpClient = http.Client();
+  static final String baseUrl = (
+    App.application.config.env == 'development' ? 'https://preprod-jselvis.unact.ru/web/' : 'https://selvis.com/web/'
+  );
 
   static String _writeParam(String key, String value) {
     return Uri.encodeQueryComponent(key) + '=' + Uri.encodeQueryComponent(value);
@@ -25,7 +28,7 @@ class Api {
     String queryParams = params.entries.map<String>(
       (MapEntry<String, dynamic> entry) => _writeParam(entry.key, entry.value.toString())
     ).join('&');
-    Uri url = Uri.parse(App.application.config.apiBaseUrl + apiMethod + '?' + queryParams);
+    Uri url = Uri.parse(baseUrl + apiMethod + '?' + queryParams);
     http.Request request = http.Request(httpMethod, url);
     if (body != null) request.body = body;
 

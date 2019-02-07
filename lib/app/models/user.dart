@@ -109,6 +109,15 @@ class User {
     await User.currentUser.save();
   }
 
+  static Future<bool> userExists(String login) async {
+    return await Api.post(
+      'login/isExists',
+      params: {
+        'login': login
+      }
+    );
+  }
+
   void reset() {
     uid = kGuestUid;
     lastDraft = null;

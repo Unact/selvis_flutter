@@ -1,6 +1,15 @@
+import 'package:intl/intl.dart';
+
 import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/models/order_line.dart';
 import 'package:selvis_flutter/app/utils/nullify.dart';
+
+enum PaymentTypes {
+  unknown,
+  cash,
+  cashless,
+  card
+}
 
 class Order {
   String guid;
@@ -19,6 +28,31 @@ class Order {
     total = values['total'];
     shipAddress = values['shipAddress'];
     deliveryDate = Nullify.parseDate(values['deliveryDate']);
+  }
+
+  static Future<void> createOrder(
+    String guid,
+    PaymentTypes paymentType,
+    DateTime deliveryDate,
+    String phone,
+    String email,
+    String personName,
+    String deliveryAddressText,
+    String fiasCode
+  ) async {
+    await Api.post(
+      'orderEditor/ready',
+      params: {
+        'legalTransaction': false,
+        'guid': guid,
+        'paymentMethod': paymentType.index,
+        'email': email,
+        'deliveryAddressText': deliveryAddressText,
+        'fiasCode': fiasCode,
+        'phoneForNotifications': phone,
+        'deliveryDate': DateFormat('yyyy-MM-dd').format(deliveryDate),
+      }
+    );
   }
 
   static Future<List<Order>> loadHistory() async {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 
 class Group {
@@ -9,7 +8,7 @@ class Group {
   int productCount;
   List<Group> childrenList;
 
-  Image get image => Image.network(App.application.config.apiBaseUrl + 'images/source/groups/$title');
+  Image get image => Image.network(Api.baseUrl + 'images/source/groups/$title');
 
   Group(Map<String, dynamic> values) {
     id = values['id'];

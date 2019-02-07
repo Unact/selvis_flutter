@@ -36,7 +36,7 @@ void main() async {
     deviceModel: deviceModel,
     osVersion: osVersion,
     env: development ? 'development' : 'production',
-    apiBaseUrl: '${development ? 'https://preprod-jselvis.unact.ru' : 'https://selvis.com'}/web/',
+    dadataApiKey: appEnv['DADATA_API_KEY'],
     sentryDsn: appEnv['SENTRY_DSN']
   ))).run();
 }

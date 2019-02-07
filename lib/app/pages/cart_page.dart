@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/models/user.dart';
+import 'package:selvis_flutter/app/pages/complete_order_page.dart';
 import 'package:selvis_flutter/app/pages/product_page.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
@@ -46,10 +47,13 @@ class _CartPageState extends State<CartPage> {
             }).toList()
           ),
         ),
-        RaisedButton(
+        _products.isEmpty ? Container() : RaisedButton(
           child: Text('Перейти к оформлению'),
           onPressed: () async {
-            print('Implement me!');
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CompleteOrderPage(products: _products))
+              );
           },
         )
       ]

@@ -9,7 +9,7 @@ class AppConfig {
     @required this.packageInfo,
     @required this.env,
     @required this.sentryDsn,
-    @required this.apiBaseUrl
+    @required this.dadataApiKey
   });
 
   final PackageInfo packageInfo;
@@ -18,5 +18,5 @@ class AppConfig {
   final String osVersion;
   final String env;
   final String sentryDsn;
-  final String apiBaseUrl;
+  final String dadataApiKey;
 }
