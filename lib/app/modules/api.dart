@@ -116,7 +116,7 @@ class Api {
         List<String> rawCookies = setCookie.split(';');
 
         for (String rawCookie in rawCookies) {
-          if (rawCookie.length > 0) {
+          if (rawCookie.isNotEmpty) {
             List<String> keyValue = rawCookie.split('=');
 
             if (keyValue.length == 2) {

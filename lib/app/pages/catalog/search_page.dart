@@ -15,7 +15,7 @@ class _SearchPageState extends State<SearchPage> {
   List<Product> _products;
 
   Widget _buildProductList(BuildContext context) {
-    if (_products.length == 0) {
+    if (_products.isEmpty) {
       return Center(child: Text('Ничего не найдено', textAlign: TextAlign.center));
     }
 
