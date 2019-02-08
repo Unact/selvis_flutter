@@ -21,8 +21,7 @@ class Sentry {
         exception: errorDetails.exception,
         stackTrace: errorDetails.stack,
         userContext: sentryLib.User(
-          id: user.uid,
-          username: user.fullname,
+          id: user.login,
           email: user.email
         ),
         environment: config.env,

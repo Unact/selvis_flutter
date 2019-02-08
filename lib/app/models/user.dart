@@ -10,7 +10,7 @@ import 'package:selvis_flutter/app/modules/api.dart';
 class User {
   User.init() {
     _currentUser = this;
-    uid = App.application.prefs.getString('uid') ?? kGuestUid;
+    login = App.application.prefs.getString('login') ?? kGuestLogin;
     lastDraft = App.application.prefs.getString('lastDraft');
     sessionId = App.application.prefs.getString('sessionId');
     refreshToken = App.application.prefs.getString('refreshToken');
@@ -26,9 +26,9 @@ class User {
   static User _currentUser;
   static User get currentUser => _currentUser;
 
-  static const String kGuestUid = 'guest';
+  static const String kGuestLogin = 'guest';
 
-  String uid;
+  String login;
   String lastDraft;
   String sessionId;
   String refreshToken;
@@ -87,6 +87,7 @@ class User {
   Future<void> loadAdditionalData() async {
     Map<String, dynamic> res = await Api.get('user-profile/getProfile');
 
+    login = res['login'];
     firstname = res['firstname'];
     lastname = res['lastname'];
     middlename = res['middlename'];
@@ -119,7 +120,7 @@ class User {
   }
 
   void reset() {
-    uid = kGuestUid;
+    login = kGuestLogin;
     lastDraft = null;
     sessionId = null;
     refreshToken = null;
@@ -133,7 +134,7 @@ class User {
   Future<void> save() async {
     SharedPreferences prefs = App.application.prefs;
 
-    await (uid != null ? prefs.setString('uid', uid) : prefs.remove('uid'));
+    await (login != null ? prefs.setString('login', login) : prefs.remove('login'));
     await (lastDraft != null ? prefs.setString('lastDraft', lastDraft) : prefs.remove('lastDraft'));
     await (sessionId != null ? prefs.setString('sessionId', sessionId) : prefs.remove('sessionId'));
     await (refreshToken != null ? prefs.setString('refreshToken', refreshToken) : prefs.remove('refreshToken'));
