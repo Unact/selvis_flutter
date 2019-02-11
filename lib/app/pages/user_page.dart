@@ -2,6 +2,7 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/pages/orders_page.dart';
@@ -22,6 +23,17 @@ class _UserPageState extends State<UserPage> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: Text('Профиль'),
+      actions: <Widget>[
+        IconButton(
+          color: Colors.white,
+          icon: Icon(Icons.info),
+          onPressed: () {
+            String version = App.application.config.packageInfo.version;
+
+            return _apiWidgetKey.currentState?.showMessage('Версия приложения: $version');
+          }
+        ),
+      ],
     );
   }
 

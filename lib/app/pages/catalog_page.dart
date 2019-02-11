@@ -89,7 +89,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
         errorMsg = 'Товар не найден';
       }
     } on PlatformException catch (e) {
-      errorMsg = 'Не известная ошибка: $e';
+      errorMsg = 'Произошла неизвестная ошибка';
 
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         errorMsg = 'Необходимо дать доступ к использованию камеры';

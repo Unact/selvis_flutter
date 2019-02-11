@@ -59,9 +59,11 @@ class Product {
   static Future<Product> loadByBarcode(String barcode) async {
     Map<String, dynamic> res = (
       await Api.get('orderEditor/getSkuSpec', params: {'barcode': barcode})
-    )['line'];
+    );
 
-    return Product(res);
+    if (res == null) return null;
+
+    return Product(res['line']);
   }
 
   static Future<List<Product>> loadByName(String name) async {
