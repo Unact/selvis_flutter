@@ -71,3 +71,4 @@ build/
 
 # Project files
 .app_env
+android/key.properties
