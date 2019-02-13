@@ -30,8 +30,7 @@ class _CartPageState extends State<CartPage> {
             children: _products.where((Product product) => product.quantity > 0).map((Product product) {
               return ListTile(
                 onTap: () async {
-                  await Navigator.push(
-                    context,
+                  await Navigator.of(context, rootNavigator: true).push(
                     MaterialPageRoute(builder: (context) => ProductPage(product: product))
                   );
                   setState(() {});
@@ -50,8 +49,7 @@ class _CartPageState extends State<CartPage> {
         _products.isEmpty ? Container() : RaisedButton(
           child: Text('Перейти к оформлению'),
           onPressed: () async {
-              await Navigator.push(
-                context,
+              await Navigator.of(context, rootNavigator: true).push(
                 MaterialPageRoute(builder: (context) => CompleteOrderPage(products: _products))
               );
           },

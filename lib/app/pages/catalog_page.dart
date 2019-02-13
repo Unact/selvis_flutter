@@ -74,7 +74,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
   }
 
   void _searchProduct() async {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => SearchPage()));
   }
 
   void _scanBarcode() async {
@@ -84,7 +84,9 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       Product product = await Product.loadByBarcode(await BarcodeScanner.scan());
 
       if (product != null) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
+        await Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(builder: (context) => ProductPage(product: product))
+        );
       } else {
         errorMsg = 'Товар не найден';
       }

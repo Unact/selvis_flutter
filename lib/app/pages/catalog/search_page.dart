@@ -21,6 +21,7 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         title: TypeAheadField(
           textFieldConfiguration: TextFieldConfiguration(
+            autofocus: true,
             autocorrect: false,
             controller: _queryTextController,
             style: theme.primaryTextTheme.title,
@@ -61,16 +62,13 @@ class _SearchPageState extends State<SearchPage> {
                 height: 52
               ),
               isThreeLine: false,
-              title: Text(suggestion.wareName, style: Theme.of(context).textTheme.caption),
-              onTap: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => ProductPage(product: suggestion))
-                );
-              }
+              title: Text(suggestion.wareName, style: Theme.of(context).textTheme.caption)
             );
           },
           onSuggestionSelected: (suggestion) async {
-
+            await Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(builder: (context) => ProductPage(product: suggestion))
+            );
           }
         ),
         actions: _buildActions(context),
