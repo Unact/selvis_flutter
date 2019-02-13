@@ -24,17 +24,43 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return ListView(
+    return GridView.count(
+      crossAxisCount: 2,
+      padding: EdgeInsets.only(top: 20.0),
+      crossAxisSpacing: 16.0,
+      mainAxisSpacing: 4.0,
       children: _products.map((Product product) {
-        return ListTile(
+        return GestureDetector(
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
           },
-          title: Text(product.wareName, style: Theme.of(context).textTheme.caption),
-          leading: SizedBox(
-            child: product.image,
-            width: 48,
-            height: 52
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                child: product.image,
+                height: 64,
+                width: 64
+              ),
+              SizedBox(height: 4.0),
+              Text(
+                product.wareName,
+                style: TextStyle(fontSize: 12.0),
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                maxLines: 3,
+              ),
+              SizedBox(height: 4.0),
+              Row(
+                children: <Widget>[
+                  Text(
+                    '${product.price} ',
+                    style: Theme.of(context).textTheme.subtitle,
+                    textAlign: TextAlign.left,
+                  ),
+                  Text('руб.', style: TextStyle(fontSize: 10.0))
+                ],
+              ),
+            ]
           )
         );
       }).toList()

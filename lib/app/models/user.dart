@@ -7,6 +7,22 @@ import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 
+class UserAddress {
+  final String addressId;
+  final String address;
+  final String legalName;
+
+  UserAddress(this.addressId, this.address, this.legalName);
+
+   Map<String, dynamic> toJson() {
+    return {
+      'addressId': addressId,
+      'address': address,
+      'legalName': legalName
+    };
+  }
+}
+
 class User {
   User.init() {
     _currentUser = this;
@@ -19,6 +35,9 @@ class User {
     middlename = App.application.prefs.getString('middlename');
     phone = App.application.prefs.getString('phone');
     email = App.application.prefs.getString('email');
+    addresses = jsonDecode(App.application.prefs.getString('addresses') ?? "[]").map<UserAddress>(
+      (dynamic val) => UserAddress(val['addressId'], val['address'], val['legalName'])
+    ).toList();
   }
 
   User._();
@@ -32,6 +51,7 @@ class User {
   String lastDraft;
   String sessionId;
   String refreshToken;
+  List<UserAddress> addresses = [];
 
   String firstname;
   String lastname;
@@ -52,6 +72,12 @@ class User {
       middlename = userData['middlename'];
       phone = userData['phone'];
       email = userData['email'];
+      addresses = res['addresses'].map<UserAddress>(
+        (dynamic val) {
+          Map<String, dynamic> info = val['address'];
+          return UserAddress(info['addressId'], info['address'], info['legalName']);
+        }
+      ).toList();
     }
     if ((await Product.loadOrdered(User.currentUser.lastDraft)).isEmpty) {
       await newDraft();
@@ -85,15 +111,7 @@ class User {
   }
 
   Future<void> loadAdditionalData() async {
-    Map<String, dynamic> res = await Api.get('user-profile/getProfile');
-
-    login = res['login'];
-    firstname = res['firstname'];
-    lastname = res['lastname'];
-    middlename = res['middlename'];
-    phone = res['phone'];
-    email = res['email'];
-    await User.currentUser.save();
+    await apiLogin({});
   }
 
   Future<void> changeAdditionalData() async {
@@ -129,6 +147,7 @@ class User {
     middlename = null;
     email = null;
     phone = null;
+    addresses = [];
   }
 
   Future<void> save() async {
@@ -143,5 +162,6 @@ class User {
     await (middlename != null ? prefs.setString('middlename', middlename) : prefs.remove('middlename'));
     await (phone != null ? prefs.setString('phone', phone) : prefs.remove('phone'));
     await (email != null ? prefs.setString('email', email) : prefs.remove('email'));
+    prefs.setString('addresses', jsonEncode(addresses));
   }
 }

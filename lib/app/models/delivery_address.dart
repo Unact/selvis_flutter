@@ -6,15 +6,18 @@ import 'package:selvis_flutter/app/utils/nullify.dart';
 class DeliveryAddress {
   double deliveryCost;
   DateTime date;
+  String message;
+  String title;
 
   DeliveryAddress(Map<String, dynamic> values) {
     deliveryCost = Nullify.parseDouble(values['deliveryCost']);
     date = Nullify.parseDate(values['date']);
+    title = values['title'];
+    message = values['message'];
   }
 
   static Future<List<DeliveryAddress>> loadForDelivery(
     String guid,
-    String fiasCode,
     DateTime date,
     String addressText
   ) async {
@@ -22,7 +25,6 @@ class DeliveryAddress {
       'orderEditor/getDeliveryVariants',
       params: {
         'guid': guid,
-        'fiasCode': fiasCode,
         'deliveryDate': DateFormat('yyyy-MM-dd').format(date),
         'deliveryAddressText': addressText
     })).first;

@@ -37,8 +37,10 @@ class Order {
     String phone,
     String email,
     String personName,
-    String deliveryAddressText,
-    String fiasCode
+    {
+      String deliveryAddressText,
+      String addressId
+    }
   ) async {
     await Api.post(
       'orderEditor/ready',
@@ -48,7 +50,7 @@ class Order {
         'paymentMethod': paymentType.index,
         'email': email,
         'deliveryAddressText': deliveryAddressText,
-        'fiasCode': fiasCode,
+        'addressId': addressId,
         'phoneForNotifications': phone,
         'deliveryDate': DateFormat('yyyy-MM-dd').format(deliveryDate),
       }
