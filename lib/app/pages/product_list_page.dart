@@ -55,12 +55,11 @@ class _ProductListPageState extends State<ProductListPage> {
               Row(
                 children: <Widget>[
                   Text(
-                    '${product.price} ',
+                    '${product.price} ₽',
                     style: Theme.of(context).textTheme.subtitle,
                     textAlign: TextAlign.left,
-                  ),
-                  Text('руб.', style: TextStyle(fontSize: 10.0))
-                ],
+                  )
+                ]
               ),
             ]
           )

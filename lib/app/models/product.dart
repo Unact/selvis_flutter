@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'package:selvis_flutter/app/models/product_spec.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
+
+class ProductSpec {
+  String value;
+  String name;
+  bool invisible;
+
+  ProductSpec(Map<String, dynamic> values) {
+    value = values['value'];
+    name = values['name'];
+    invisible = values['invisible'];
+  }
+}
 
 class Product {
   String skuGuid;

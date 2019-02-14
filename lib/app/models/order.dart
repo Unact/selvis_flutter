@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 
 import 'package:selvis_flutter/app/modules/api.dart';
-import 'package:selvis_flutter/app/models/order_line.dart';
 import 'package:selvis_flutter/app/utils/nullify.dart';
 
 enum PaymentTypes {
@@ -9,6 +8,24 @@ enum PaymentTypes {
   cash,
   cashless,
   card
+}
+
+class OrderLine {
+  String lineId;
+  String name;
+  double price;
+  String skuGuid;
+  int quantity;
+  double sum;
+
+  OrderLine(Map<String, dynamic> values) {
+    lineId = values['lineId'];
+    name = values['name'];
+    price = values['price'];
+    skuGuid = values['skuGuid'];
+    quantity = values['quantity'];
+    sum = values['sum'];
+  }
 }
 
 class Order {

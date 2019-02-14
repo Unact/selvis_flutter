@@ -449,7 +449,9 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
           Padding(
             padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
             child: RaisedButton(
-              child: Text('Заказать'),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32.0)),
+              color: Theme.of(context).accentColor,
+              child: Text('Заказать', style: Theme.of(context).primaryTextTheme.button),
               onPressed: _submitOrder
             )
           )

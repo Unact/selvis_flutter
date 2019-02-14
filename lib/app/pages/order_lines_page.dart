@@ -2,7 +2,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/models/order.dart';
-import 'package:selvis_flutter/app/models/order_line.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
 class OrderLinesPage extends StatefulWidget {
