@@ -47,7 +47,7 @@ class _CartPageState extends State<CartPage> {
 
     return ListView.separated(
       separatorBuilder: (BuildContext context, int idx) => Divider(height: 4, color: Theme.of(context).accentColor),
-      itemCount:  productsToShow.length,
+      itemCount: productsToShow.length,
       itemBuilder: (BuildContext context, int idx) {
         Product product = productsToShow[idx];
 
@@ -135,6 +135,7 @@ class _CartPageState extends State<CartPage> {
     return ApiPageWidget(
       buildPersistentFooterButtons: _buildPersistentFooterButtons,
       buildAppBar: _buildAppBar,
+      bodyWithPadding: false,
       buildBody: _buildBody,
       loadData: _loadData
     );

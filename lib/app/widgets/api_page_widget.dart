@@ -8,11 +8,13 @@ class ApiPageWidget extends StatefulWidget {
   final Function buildAppBar;
   final Function buildBody;
   final Function loadData;
+  final bool bodyWithPadding;
 
   ApiPageWidget({
     Key key,
     @required this.buildAppBar,
     @required this.buildBody,
+    this.bodyWithPadding = true,
     this.buildBottomNavigationBar,
     this.buildPersistentFooterButtons,
     this.loadData,
@@ -74,7 +76,7 @@ class ApiPageWidgetState extends State<ApiPageWidget> with WidgetsBindingObserve
         key: _refreshIndicatorKey,
         onRefresh: _loadData,
         child: Container(
-          padding: EdgeInsets.only(left: 8.0, right: 8.0),
+          padding: widget.bodyWithPadding ? EdgeInsets.only(left: 8.0, right: 8.0) : EdgeInsets.all(0),
           child: widget.buildBody(context)
         )
       )
