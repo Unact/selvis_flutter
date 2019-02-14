@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_navigator_bottom_bar/multi_navigator_bottom_bar.dart';
 
 import 'package:selvis_flutter/app/pages/catalog_page.dart';
 import 'package:selvis_flutter/app/pages/cart_page.dart';
@@ -12,50 +13,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-  List<Widget> _children = [];
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      onTap: (int index) => setState(() => _currentIndex = index),
-      items: [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.category),
-          title: Text('Каталог')
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_cart),
-          title: Text('Корзина'),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_box),
-          title: Text('Профиль'),
-        )
-      ],
-    );
-  }
-
-  Widget _buildBody(BuildContext context) {
-    return _children[_currentIndex];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _children = [
-      CatalogPage(),
-      CartPage(),
-      UserPage(),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: _buildBottomNavigationBar(context),
-      body: _buildBody(context)
+      body: MultiNavigatorBottomBar(
+      currentTabIndex: 0,
+      tabs: [
+        BottomBarTab(
+          initPageBuilder: (_) => CatalogPage(),
+          tabIconBuilder: (_) => Icon(Icons.category),
+          tabTitleBuilder: (_) => Text('Каталог')
+        ),
+        BottomBarTab(
+          initPageBuilder: (_) => CartPage(),
+          tabIconBuilder: (_) => Icon(Icons.shopping_cart),
+          tabTitleBuilder: (_) => Text('Корзина'),
+          savePageState: false
+        ),
+        BottomBarTab(
+          initPageBuilder: (_) => UserPage(),
+          tabIconBuilder: (_) => Icon(Icons.account_box),
+          tabTitleBuilder: (_) => Text('Профиль'),
+          savePageState: false
+        ),
+      ]
+      )
     );
   }
 }

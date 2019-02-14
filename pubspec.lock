@@ -74,6 +74,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_sticky_header:
+    dependency: "direct main"
+    description:
+      name: flutter_sticky_header
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -121,6 +128,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.6"
+  multi_navigator_bottom_bar:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "4f095d413d54a2dece20c3342a1eaa621111e901"
+      resolved-ref: "4f095d413d54a2dece20c3342a1eaa621111e901"
+      url: "git://github.com/DCrow/flutter_multi_navigator_bottom_bar"
+    source: git
+    version: "0.0.3"
   package_info:
     dependency: "direct main"
     description:

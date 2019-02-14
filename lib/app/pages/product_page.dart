@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:selvis_flutter/app/models/product.dart';
-import 'package:selvis_flutter/app/models/product_spec.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
@@ -38,38 +37,12 @@ class _ProductPageState extends State<ProductPage> {
               },
               children: <TableRow>[
                 _buildTableRow(context, 'Товар', widget.product.wareName),
-              ]..addAll(widget.product.productSpecs.map((ProductSpec spec) {
-                return _buildTableRow(context, spec.name, spec.value);
-              }))..addAll([
-                _buildTableRow(context, 'НДС', (widget.product.vat?.toStringAsFixed(0) ?? 'Не задан')),
+              ]..addAll([
                 _buildTableRow(context, 'Цена', widget.product.price.toString()),
-                _buildTableRow(context, 'Кол-во', widget.product.quantity.toStringAsFixed(0)),
-                _buildTableRow(context, 'Итого', widget.product.sum.toStringAsFixed(2)),
-              ])
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                  child: Text('-${widget.product.multiple}'),
-                  onPressed: () async {
-                    int newQuantity = widget.product.quantity - widget.product.multiple;
-
-                    await widget.product.changeQuantity(newQuantity, User.currentUser.lastDraft);
-                    setState((){});
-                  },
-                ),
-                SizedBox(width: 20),
-                RaisedButton(
-                  child: Text('+${widget.product.multiple}'),
-                  onPressed: () async {
-                    int newQuantity = widget.product.quantity + widget.product.multiple;
-
-                    await widget.product.changeQuantity(newQuantity, User.currentUser.lastDraft);
-                    setState((){});
-                  },
-                )
-              ]
+                _buildTableRow(context, 'НДС', (widget.product.vat?.toStringAsFixed(0) ?? 'Не задан')),
+              ])..addAll(widget.product.productSpecs.map((ProductSpec spec) {
+                return _buildTableRow(context, spec.name, spec.value);
+              }))
             ),
           ]
         )
@@ -96,9 +69,47 @@ class _ProductPageState extends State<ProductPage> {
     await widget.product.loadAdditionalData();
   }
 
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return BottomAppBar(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          FlatButton(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+            padding: EdgeInsets.only(right: 8, left: 8),
+            color: Theme.of(context).accentColor,
+            child: Text('-${widget.product.multiple}', style: Theme.of(context).primaryTextTheme.button),
+            onPressed: () async {
+              int newQuantity = widget.product.quantity - widget.product.multiple;
+
+              await widget.product.changeQuantity(newQuantity, User.currentUser.lastDraft);
+              setState((){});
+            },
+          ),
+          FlatButton(
+            onPressed: null,
+            child: Text(widget.product.quantity.toStringAsFixed(0), style: Theme.of(context).textTheme.title),
+          ),
+          FlatButton(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+            color: Theme.of(context).accentColor,
+            child: Text('+${widget.product.multiple}', style: Theme.of(context).primaryTextTheme.button),
+            onPressed: () async {
+              int newQuantity = widget.product.quantity + widget.product.multiple;
+
+              await widget.product.changeQuantity(newQuantity, User.currentUser.lastDraft);
+              setState((){});
+            },
+          )
+        ]
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ApiPageWidget(
+      buildBottomNavigationBar: _buildBottomNavigationBar,
       buildAppBar: _buildAppBar,
       buildBody: _buildBody,
       loadData: _loadData,

@@ -31,8 +31,10 @@ class _ProductListPageState extends State<ProductListPage> {
       mainAxisSpacing: 4.0,
       children: _products.map((Product product) {
         return GestureDetector(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => ProductPage(product: product)));
+          onTap: () async {
+            await Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(builder: (context) => ProductPage(product: product))
+            );
           },
           child: Column(
             children: <Widget>[
@@ -53,12 +55,11 @@ class _ProductListPageState extends State<ProductListPage> {
               Row(
                 children: <Widget>[
                   Text(
-                    '${product.price} ',
+                    '${product.price} ₽',
                     style: Theme.of(context).textTheme.subtitle,
                     textAlign: TextAlign.left,
-                  ),
-                  Text('руб.', style: TextStyle(fontSize: 10.0))
-                ],
+                  )
+                ]
               ),
             ]
           )

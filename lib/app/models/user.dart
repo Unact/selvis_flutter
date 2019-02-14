@@ -80,7 +80,7 @@ class User {
       ).toList();
     }
     if ((await Product.loadOrdered(User.currentUser.lastDraft)).isEmpty) {
-      await newDraft();
+      await apiLastDraft();
     }
 
     await save();
@@ -102,12 +102,16 @@ class User {
   Future<void> apiLogout() async {
     await Api.post('login/logout');
     reset();
-    await newDraft();
+    await apiNewDraft();
     await save();
   }
 
-  Future<void> newDraft() async {
+  Future<void> apiNewDraft() async {
     lastDraft = await Api.post('orderEditor/newOrder');
+  }
+
+  Future<void> apiLastDraft() async {
+    lastDraft = (await Api.post('orderEditor/lastDraft'))['guid'];
   }
 
   Future<void> loadAdditionalData() async {

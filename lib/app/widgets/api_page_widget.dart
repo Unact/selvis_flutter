@@ -3,14 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 
 class ApiPageWidget extends StatefulWidget {
+  final Function buildPersistentFooterButtons;
+  final Function buildBottomNavigationBar;
   final Function buildAppBar;
   final Function buildBody;
   final Function loadData;
+  final bool bodyWithPadding;
 
   ApiPageWidget({
     Key key,
     @required this.buildAppBar,
     @required this.buildBody,
+    this.bodyWithPadding = true,
+    this.buildBottomNavigationBar,
+    this.buildPersistentFooterButtons,
     this.loadData,
   }) : super(key: key);
 
@@ -60,11 +66,17 @@ class ApiPageWidgetState extends State<ApiPageWidget> with WidgetsBindingObserve
     return Scaffold(
       key: _scaffoldKey,
       appBar: widget.buildAppBar(context),
+      persistentFooterButtons: widget.buildPersistentFooterButtons != null ?
+        widget.buildPersistentFooterButtons(context) :
+        null,
+      bottomNavigationBar: widget.buildBottomNavigationBar != null ?
+        widget.buildBottomNavigationBar(context) :
+        null,
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _loadData,
         child: Container(
-          padding: EdgeInsets.only(left: 8.0, right: 8.0),
+          padding: widget.bodyWithPadding ? EdgeInsets.only(left: 8.0, right: 8.0) : EdgeInsets.all(0),
           child: widget.buildBody(context)
         )
       )
