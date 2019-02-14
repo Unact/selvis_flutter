@@ -20,6 +20,7 @@ dependencies:
   device_info: any
   package_info: any
   flutter_typeahead: any
+  flutter_sticky_header: any
   multi_navigator_bottom_bar:
     git:
       url: git://github.com/DCrow/flutter_multi_navigator_bottom_bar
