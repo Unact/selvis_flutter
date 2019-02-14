@@ -98,7 +98,6 @@ class _CartPageState extends State<CartPage> {
                         width: 32,
                         child: Text(product.quantity.toStringAsFixed(0), textAlign: TextAlign.center)
                       ),
-
                       IconButton(
                         iconSize: 12,
                         padding: EdgeInsets.all(0),
@@ -114,8 +113,8 @@ class _CartPageState extends State<CartPage> {
                     ]
                   ),
                   Expanded(
-                      child: Text(product.sum.toStringAsFixed(2) + ' ₽', textAlign: TextAlign.end)
-                    ),
+                    child: Text(product.sum.toStringAsFixed(2) + ' ₽', textAlign: TextAlign.end)
+                  ),
                   SizedBox(width: 8)
                 ]
               )

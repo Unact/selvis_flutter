@@ -17,26 +17,26 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: MultiNavigatorBottomBar(
-      currentTabIndex: 0,
-      tabs: [
-        BottomBarTab(
-          initPageBuilder: (_) => CatalogPage(),
-          tabIconBuilder: (_) => Icon(Icons.category),
-          tabTitleBuilder: (_) => Text('Каталог')
-        ),
-        BottomBarTab(
-          initPageBuilder: (_) => CartPage(),
-          tabIconBuilder: (_) => Icon(Icons.shopping_cart),
-          tabTitleBuilder: (_) => Text('Корзина'),
-          savePageState: false
-        ),
-        BottomBarTab(
-          initPageBuilder: (_) => UserPage(),
-          tabIconBuilder: (_) => Icon(Icons.account_box),
-          tabTitleBuilder: (_) => Text('Профиль'),
-          savePageState: false
-        ),
-      ]
+        currentTabIndex: 0,
+        tabs: [
+          BottomBarTab(
+            initPageBuilder: (_) => CatalogPage(),
+            tabIconBuilder: (_) => Icon(Icons.category),
+            tabTitleBuilder: (_) => Text('Каталог')
+          ),
+          BottomBarTab(
+            initPageBuilder: (_) => CartPage(),
+            tabIconBuilder: (_) => Icon(Icons.shopping_cart),
+            tabTitleBuilder: (_) => Text('Корзина'),
+            savePageState: false
+          ),
+          BottomBarTab(
+            initPageBuilder: (_) => UserPage(),
+            tabIconBuilder: (_) => Icon(Icons.account_box),
+            tabTitleBuilder: (_) => Text('Профиль'),
+            savePageState: false
+          )
+        ]
       )
     );
   }
