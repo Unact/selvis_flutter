@@ -2,22 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>provisioningProfiles</key>
-	<dict>
-		<key>com.selvis.app</key>
-		<string>5191fabb-061d-450a-a74b-19d57646cc92</string>
-	</dict>
 	<key>compileBitcode</key>
 	<false/>
 	<key>method</key>
-	<string>app-store</string>
+	<string>enterprise</string>
 	<key>signingStyle</key>
-	<string>Manual</string>
+	<string>automatic</string>
 	<key>stripSwiftSymbols</key>
 	<true/>
 	<key>teamID</key>
-	<string>J97RNH79BP</string>
-	<key>thinning</key>
-	<string>&lt;none&gt;</string>
+	<string>FBPXDS9DW7</string>
 </dict>
 </plist>
