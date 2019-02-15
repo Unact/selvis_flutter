@@ -388,6 +388,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "5191fabb-061d-450a-a74b-19d57646cc92";
 				PROVISIONING_PROFILE_SPECIFIER = com.selvis.app;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Profile;
@@ -518,6 +519,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "80ae73da-8d0b-43f8-8d5d-7bb7fea3beb9";
 				PROVISIONING_PROFILE_SPECIFIER = "com.selvis.app-dev";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -546,6 +548,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "5191fabb-061d-450a-a74b-19d57646cc92";
 				PROVISIONING_PROFILE_SPECIFIER = com.selvis.app;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
