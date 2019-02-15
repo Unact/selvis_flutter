@@ -1,4 +1,4 @@
-package com.selvis.app;
+package ru.unact.selvis;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
