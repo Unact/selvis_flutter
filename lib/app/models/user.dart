@@ -111,7 +111,13 @@ class User {
   }
 
   Future<void> apiLastDraft() async {
-    lastDraft = (await Api.post('orderEditor/lastDraft'))['guid'];
+    Map<String, dynamic> res = await Api.post(
+      'orderEditor/lastDraft',
+      params: {
+        'addressId': addresses.isNotEmpty ? addresses.first.addressId : null
+      }
+    );
+    lastDraft = res['guid'];
   }
 
   Future<void> loadAdditionalData() async {
