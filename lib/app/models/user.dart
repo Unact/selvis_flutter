@@ -106,6 +106,10 @@ class User {
     await save();
   }
 
+  Future<void> apiRestorePassword(String login) async {
+    await Api.post('login/restorePassword', params: {'username': login});
+  }
+
   Future<void> apiNewDraft() async {
     lastDraft = await Api.post('orderEditor/newOrder');
   }

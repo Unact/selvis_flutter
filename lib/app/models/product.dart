@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 
 import 'package:selvis_flutter/app/modules/api.dart';
 
@@ -28,7 +29,7 @@ class Product {
   bool haveImage;
 
   double get sum => price * quantity;
-  Image get image => haveImage ? Image.network(Api.baseUrl + 'images/$productGuid.png') : null;
+  Image get image => haveImage ? Image(image: AdvancedNetworkImage(Api.baseUrl + 'images/$productGuid.png')) : null;
 
   Product(Map<String, dynamic> values) {
     skuGuid = values['skuGuid'];
