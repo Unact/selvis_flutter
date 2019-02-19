@@ -1,6 +1,6 @@
 name: selvis_flutter
 description: Приложение для сайта selvis.com
-version: 1.0.10+8
+version: 1.0.10+9
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
