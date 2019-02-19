@@ -17,8 +17,8 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   GlobalKey<ApiPageWidgetState> _apiWidgetKey = GlobalKey();
-  String _login;
-  String _password;
+  String _login = '';
+  String _password = '';
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -98,7 +98,25 @@ class _UserPageState extends State<UserPage> {
               child: Text('QR'),
             ),
           ]
-        )
+        ),
+        FlatButton(
+          onPressed: () async {
+            try {
+              if (_login.isEmpty) {
+                _apiWidgetKey.currentState?.showMessage('Необходимо указать телефон/e-mail');
+                return;
+              }
+
+              await User.currentUser.apiRestorePassword(_login);
+              _apiWidgetKey.currentState?.showMessage('Отправлен e-mail/sms');
+              setState(() {});
+            } on ApiException catch(e) {
+              _apiWidgetKey.currentState?.showMessage(e.errorMsg);
+            }
+          },
+          textColor: Colors.blueGrey,
+          child: Text('Забыли пароль?'),
+        ),
       ]
     );
   }
@@ -181,29 +199,36 @@ class _UserPageState extends State<UserPage> {
               ]
             ),
             Padding(
-              padding: EdgeInsets.only(top: 16.0),
-              child: RaisedButton(
-                onPressed: () async {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => OrdersPage()));
-                },
-                child: Text('Список заказов'),
-              ),
-            ),
-            Container(
-              width: 80.0,
-              child: RaisedButton(
-                onPressed: () async {
-                  try {
-                    await user.apiLogout();
-                    setState(() {});
-                  } on ApiException catch(e) {
-                    _apiWidgetKey.currentState?.showMessage(e.errorMsg);
-                  }
-                },
-                color: Colors.blueGrey,
-                textColor: Colors.white,
-                child: Text('Выйти'),
-              ),
+              padding: EdgeInsets.only(top: 16.0, left: 8.0, right: 8.0),
+              child:Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  RaisedButton(
+                      onPressed: () async {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => OrdersPage()));
+                      },
+                      child: Text('Список заказов'),
+                    ),
+                  Container(
+                    width: 80.0,
+                    child: RaisedButton(
+                      onPressed: () async {
+                        try {
+                          await user.apiLogout();
+                          _login = '';
+                          _password = '';
+                          setState(() {});
+                        } on ApiException catch(e) {
+                          _apiWidgetKey.currentState?.showMessage(e.errorMsg);
+                        }
+                      },
+                      color: Colors.blueGrey,
+                      textColor: Colors.white,
+                      child: Text('Выйти'),
+                    ),
+                  )
+                ]
+              )
             )
           ],
         )
