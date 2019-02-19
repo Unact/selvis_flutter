@@ -6,6 +6,7 @@ import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
 import 'package:selvis_flutter/app/pages/orders_page.dart';
+import 'package:selvis_flutter/app/pages/password_recovery_page.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
 
 class UserPage extends StatefulWidget {
@@ -101,18 +102,10 @@ class _UserPageState extends State<UserPage> {
         ),
         FlatButton(
           onPressed: () async {
-            try {
-              if (_login.isEmpty) {
-                _apiWidgetKey.currentState?.showMessage('Необходимо указать телефон/e-mail');
-                return;
-              }
-
-              await User.currentUser.apiRestorePassword(_login);
-              _apiWidgetKey.currentState?.showMessage('Отправлен e-mail/sms');
-              setState(() {});
-            } on ApiException catch(e) {
-              _apiWidgetKey.currentState?.showMessage(e.errorMsg);
-            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PasswordRecoveryPage(), fullscreenDialog: true)
+            );
           },
           textColor: Colors.blueGrey,
           child: Text('Забыли пароль?'),
