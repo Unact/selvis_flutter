@@ -4,6 +4,7 @@ import 'package:package_info/package_info.dart';
 class AppConfig {
   AppConfig({
     @required this.isPhysicalDevice,
+    @required this.isTabletDevice,
     @required this.deviceModel,
     @required this.osVersion,
     @required this.packageInfo,
@@ -14,6 +15,7 @@ class AppConfig {
 
   final PackageInfo packageInfo;
   final bool isPhysicalDevice;
+  final bool isTabletDevice;
   final String deviceModel;
   final String osVersion;
   final String env;
