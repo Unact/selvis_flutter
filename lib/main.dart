@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:package_info/package_info.dart';
+import 'package:flutter_device_type/flutter_device_type.dart';
 
 import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/config/app_config.dart';
@@ -33,6 +34,7 @@ void main() async {
   await (App.setup(AppConfig(
     packageInfo: await PackageInfo.fromPlatform(),
     isPhysicalDevice: isPhysicalDevice,
+    isTabletDevice: Device.get().isTablet,
     deviceModel: deviceModel,
     osVersion: osVersion,
     env: development ? 'development' : 'production',

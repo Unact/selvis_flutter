@@ -1,6 +1,6 @@
 name: selvis_flutter
 description: Приложение для сайта selvis.com
-version: 1.0.11+10
+version: 1.0.11+12
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -18,6 +18,7 @@ dependencies:
   sentry: any
   dotenv: any
   shared_preferences: any
+  flutter_device_type: any
   device_info: any
   package_info: any
   flutter_typeahead: any

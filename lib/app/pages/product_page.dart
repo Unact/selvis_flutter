@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/widgets/api_page_widget.dart';
@@ -22,18 +23,18 @@ class _ProductPageState extends State<ProductPage> {
 
   Widget _buildBody(BuildContext context) {
     return ListView(
-      padding: EdgeInsets.only(top: 8.0),
+      padding: EdgeInsets.only(top: _scaleForDevice(8)),
       children: [
         Column(
           children: <Widget>[
             SizedBox(
               child: widget.product.image,
-              width: 260,
-              height: 200
+              width: _scaleForDevice(260),
+              height: _scaleForDevice(150)
             ),
             Table(
               columnWidths: <int, TableColumnWidth>{
-                0: FixedColumnWidth(132.0)
+                0: FixedColumnWidth(_scaleForDevice(132))
               },
               children: <TableRow>[
                 _buildTableRow(context, 'Товар', widget.product.wareName),
@@ -54,11 +55,11 @@ class _ProductPageState extends State<ProductPage> {
     return TableRow(
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 8.0, bottom: 4.0, right: 8.0),
+          padding: EdgeInsets.only(top: 8, bottom: 4, right: _scaleForDevice(8)),
           child: Text(key, style: TextStyle(color: Theme.of(context).accentColor), textAlign: TextAlign.end)
         ),
         Padding(
-          padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+          padding: EdgeInsets.only(top: 8, bottom: 4),
           child: Text(value, style: TextStyle(fontSize: 14.0, color: Colors.black)),
         ),
       ]
@@ -76,7 +77,7 @@ class _ProductPageState extends State<ProductPage> {
         children: <Widget>[
           FlatButton(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-            padding: EdgeInsets.only(right: 8, left: 8),
+            padding: EdgeInsets.only(right: _scaleForDevice(8), left: _scaleForDevice(8)),
             color: Theme.of(context).accentColor,
             child: Text('-${widget.product.multiple}', style: Theme.of(context).primaryTextTheme.button),
             onPressed: () async {
@@ -105,6 +106,8 @@ class _ProductPageState extends State<ProductPage> {
       )
     );
   }
+
+  double _scaleForDevice(double size) => App.application.config.isTabletDevice ? 2 * size : size;
 
   @override
   Widget build(BuildContext context) {

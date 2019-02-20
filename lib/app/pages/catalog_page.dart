@@ -56,7 +56,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
         ),
         errorBuilder: (BuildContext ctx, error) {
           return Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(_scaleForDevice(8)),
             child: Text(
               'Произошла ошибка',
               style: TextStyle(color: theme.errorColor),
@@ -65,7 +65,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
         },
         noItemsFoundBuilder: (BuildContext ctx) {
           return Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(_scaleForDevice(8)),
             child: Text(
               'Ничего не найдено',
               textAlign: TextAlign.center,
@@ -99,9 +99,10 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
   Widget _buildSliver(BuildContext context) {
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 4.0,
-        mainAxisSpacing: 4.0
+        childAspectRatio: App.application.config.isTabletDevice ? 0.8 : 1,
+        crossAxisCount: App.application.config.isTabletDevice ? 4 : 2,
+        crossAxisSpacing: _scaleForDevice(4.0),
+        mainAxisSpacing: _scaleForDevice(4.0)
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int idx) {
@@ -115,8 +116,8 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
               children: <Widget>[
                 SizedBox(
                   child: group.image,
-                  height: 112,
-                  width: 112
+                  height: _scaleForDevice(88),
+                  width: _scaleForDevice(88)
                 ),
                 Text(
                   group.title,
@@ -147,6 +148,8 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
     List<Group> topGroups = await Group.loadFromRemote();
     _groups = topGroups.map((group) => group.childrenList).expand((el) => el).toList();
   }
+
+  double _scaleForDevice(double size) => App.application.config.isTabletDevice ? 2 * size : size;
 
   void _scanBarcode() async {
     String errorMsg;
