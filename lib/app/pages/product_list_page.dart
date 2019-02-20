@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:selvis_flutter/app/app.dart';
 import 'package:selvis_flutter/app/models/group.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/pages/product_page.dart';
@@ -25,10 +26,11 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Widget _buildBody(BuildContext context) {
     return GridView.count(
-      crossAxisCount: 2,
-      padding: EdgeInsets.only(top: 20.0),
-      crossAxisSpacing: 16.0,
-      mainAxisSpacing: 4.0,
+      childAspectRatio: App.application.config.isTabletDevice ? 0.8 : 1,
+      crossAxisCount: App.application.config.isTabletDevice ? 4 : 2,
+      padding: EdgeInsets.only(top: _scaleForDevice(20)),
+      crossAxisSpacing: _scaleForDevice(16),
+      mainAxisSpacing: _scaleForDevice(4),
       children: _products.map((Product product) {
         return GestureDetector(
           onTap: () async {
@@ -40,27 +42,32 @@ class _ProductListPageState extends State<ProductListPage> {
             children: <Widget>[
               SizedBox(
                 child: product.image,
-                height: 64,
-                width: 64
+                height: _scaleForDevice(64),
+                width: _scaleForDevice(64)
               ),
-              SizedBox(height: 4.0),
-              Text(
-                product.wareName,
-                style: TextStyle(fontSize: 12.0),
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                maxLines: 3,
-              ),
-              SizedBox(height: 4.0),
-              Row(
+              SizedBox(height: _scaleForDevice(4)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '${product.price} ₽',
-                    style: Theme.of(context).textTheme.subtitle,
+                    product.wareName,
+                    style: TextStyle(fontSize: 12.0),
+                    overflow: TextOverflow.clip,
                     textAlign: TextAlign.left,
-                  )
+                    maxLines: 3,
+                  ),
+                  SizedBox(height: _scaleForDevice(4)),
+                  Row(
+                    children: <Widget>[
+                      Text(
+                        '${product.price} ₽',
+                        style: Theme.of(context).textTheme.subtitle,
+                        textAlign: TextAlign.left,
+                      )
+                    ]
+                  ),
                 ]
-              ),
+              )
             ]
           )
         );
@@ -71,6 +78,8 @@ class _ProductListPageState extends State<ProductListPage> {
   Future<void> _loadData() async {
     _products = await Product.loadByGroup3(widget.parentGroup.title);
   }
+
+  double _scaleForDevice(double size) => App.application.config.isTabletDevice ? 2 * size : size;
 
   @override
   Widget build(BuildContext context) {

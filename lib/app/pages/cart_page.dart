@@ -67,8 +67,8 @@ class _CartPageState extends State<CartPage> {
                     padding: EdgeInsets.all(8),
                     child: SizedBox(
                       child: product.image,
-                      width: 48,
-                      height: 52
+                      width: 64,
+                      height: 64
                     ),
                   ),
                   Expanded(
