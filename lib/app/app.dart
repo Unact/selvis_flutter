@@ -43,7 +43,8 @@ class App {
     return MaterialApp(
       title: title,
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey
+        primarySwatch: Colors.blueGrey,
+        platform: TargetPlatform.android,
       ),
       home: HomePage(),
       locale: Locale('ru', 'RU'),
