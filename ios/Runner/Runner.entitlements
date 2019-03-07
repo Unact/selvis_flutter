@@ -7,6 +7,9 @@
 		<string>webcredentials:selvis.com</string>
 		<string>webcredentials:*.selvis.com</string>
 		<string>webcredentials:*.unact.ru</string>
+		<string>applinks:selvis.com</string>
+		<string>applinks:*.selvis.com</string>
+		<string>applinks:*.unact.ru</string>
 	</array>
 </dict>
 </plist>
