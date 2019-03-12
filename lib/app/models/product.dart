@@ -78,6 +78,14 @@ class Product {
     return Product(res['line']);
   }
 
+  static Future<Product> loadBySkuGuid(String skuGuid) async {
+    Map<String, dynamic> res = await Api.get('orderEditor/getSkuSpec', params: {'skuGuid': skuGuid});
+
+    if (res == null) return null;
+
+    return Product(res['line']);
+  }
+
   static Future<List<Product>> loadByName(String name) async {
     List<dynamic> res = (await Api.get(
       'orderEditor/getDataRange',
