@@ -12,7 +12,7 @@ class Api {
   static final JsonEncoder _encoder = JsonEncoder();
   static final http.Client httpClient = http.Client();
   static final String baseUrl = (
-    App.application.config.env == 'development' ? 'https://preprod-jselvis.unact.ru/web/' : 'https://selvis.com/web/'
+    App.application.config.env == 'development' ? 'https://test-jselvis.unact.ru/web/' : 'https://selvis.com/web/'
   );
 
   static String _writeParam(String key, String value) {
