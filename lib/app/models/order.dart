@@ -49,6 +49,7 @@ class Order {
 
   static Future<void> createOrder(
     String guid,
+    String deliveryServiceId,
     PaymentTypes paymentType,
     DateTime deliveryDate,
     String phone,
@@ -56,18 +57,21 @@ class Order {
     String personName,
     {
       String deliveryAddressText,
-      String addressId
+      String addressId,
+      String deliveryNotes
     }
   ) async {
     await Api.post(
       'orderEditor/ready',
       params: {
+        'deliveryServiceIds': deliveryServiceId,
         'legalTransaction': false,
         'guid': guid,
         'paymentMethod': paymentType.index,
         'email': email,
         'deliveryAddressText': deliveryAddressText,
         'addressId': addressId,
+        'deliveryNotes': deliveryNotes,
         'phoneForNotifications': phone,
         'deliveryDate': DateFormat('yyyy-MM-dd').format(deliveryDate),
       }

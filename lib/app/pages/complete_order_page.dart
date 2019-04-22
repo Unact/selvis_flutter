@@ -7,7 +7,7 @@ import 'package:selvis_flutter/app/models/order.dart';
 import 'package:selvis_flutter/app/models/product.dart';
 import 'package:selvis_flutter/app/models/user.dart';
 import 'package:selvis_flutter/app/modules/api.dart';
-import 'package:selvis_flutter/app/modules/dadata_api.dart';
+import 'package:selvis_flutter/app/utils/nullify.dart';
 import 'package:selvis_flutter/app/widgets/app_expansion_tile.dart';
 
 class CompleteOrderPage extends StatefulWidget {
@@ -23,6 +23,8 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
   final TextEditingController _deliveryAddressController = TextEditingController();
   final DateTime _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   final TextStyle _defaultTextStyle = TextStyle(fontSize: 14.0, color: Colors.black);
+  final TextStyle _textFieldStyle = TextStyle(fontSize: 16.0);
+  final TextStyle _rowTextStyle = TextStyle(fontSize: 12.0, color: Colors.grey);
   final GlobalKey<AppExpansionTileState> _contactTile = GlobalKey<AppExpansionTileState>();
   final GlobalKey<AppExpansionTileState> _deliveryTile = GlobalKey<AppExpansionTileState>();
   final GlobalKey<AppExpansionTileState> _paymentTypeTile = GlobalKey<AppExpansionTileState>();
@@ -30,18 +32,19 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   FocusNode _emailFocusNode = FocusNode();
   FocusNode _phoneFocusNode = FocusNode();
-  bool _showDeliveryAddressTextField = false;
   String _contactErrorText;
   String _email = User.currentUser.isLoggedIn ? User.currentUser.email : '';
   String _name = '';
   String _phone = User.currentUser.isLoggedIn ? User.currentUser.phone : '';
-  String _manualDeliveryAddress = '';
+  String _deliveryAddressText = '';
   PaymentTypes _paymentType = PaymentTypes.cash;
-  Map<String, dynamic> _currentLocation = {};
-  List<DeliveryAddress> _deliveryAddresses;
+  List<String> _pickupAddresses = [];
+  List<DeliveryAddress> _deliveryAddresses = [];
   DateTime _deliveryDate;
   DeliveryAddress _deliveryAddress;
-  String _addressId;
+  UserAddress _userAddress;
+  List<DateTime> _deliveryDates = [];
+  String _deliveryNotes;
 
   String fieldsErrorMsg() {
     String result = '';
@@ -66,13 +69,15 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
     try {
       await Order.createOrder(
         User.currentUser.lastDraft,
+        _deliveryAddress.serviceId,
         _paymentType,
         _deliveryAddress.date,
         _phone,
         _email,
         _name,
-        deliveryAddressText: _manualDeliveryAddress,
-        addressId: _addressId
+        deliveryNotes: _deliveryNotes,
+        deliveryAddressText: _deliveryAddressText,
+        addressId: _userAddress?.addressId
       );
 
       await showDialog(
@@ -94,24 +99,6 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
     _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _updateDeliveryData() async {
-    _deliveryAddress = null;
-
-    try {
-      _deliveryAddresses = await DeliveryAddress.loadForDelivery(
-        User.currentUser.lastDraft,
-        _deliveryDate,
-        _manualDeliveryAddress
-      );
-
-      if (_deliveryAddresses.isNotEmpty) _deliveryAddress = _deliveryAddresses.first;
-
-      setState(() {});
-    } on ApiException catch(e) {
-      showMessage(e.errorMsg);
-    }
-  }
-
   void _onPaymentTypeChange(val) {
     _paymentType = val;
     setState(() {});
@@ -130,7 +117,8 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         onChanged: (String value) => _name = value,
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
-          labelText: 'Имя'
+          labelText: 'Имя',
+          labelStyle: _textFieldStyle
         ),
       ),
     );
@@ -149,7 +137,8 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         onChanged: (String value) => _phone = value,
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
-          labelText: 'Телефон'
+          labelText: 'Телефон',
+          labelStyle: _textFieldStyle
         ),
       ),
     );
@@ -169,6 +158,7 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           labelText: 'E-mail',
+          labelStyle: _textFieldStyle,
           errorText: _contactErrorText
         ),
       ),
@@ -185,39 +175,39 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
 
   Widget _buildDeliveryDate(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.only(right: 40.0, left: 40.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text('Желаемая дата доставки', style: TextStyle(fontSize: 12.0, color: Colors.grey))
-              ]
-            ),
-            Row(
-              children: <Widget>[
-                Text(DateFormat.yMMMMd('ru').format(_deliveryDate)),
-                IconButton(
-                  icon: Icon(
-                    Icons.calendar_today,
-                    size: 18.0
-                  ),
-                  onPressed: () async {
-                    DateTime newDate = await showDatePicker(
-                      context: context,
-                      initialDate: _deliveryDate,
-                      firstDate: _today,
-                      lastDate: DateTime.now().add(Duration(days: 30))
-                    );
-                    if (newDate != null) {
-                      _deliveryDate = newDate;
-                      await _updateDeliveryData();
-                    }
-                  },
-                )
-              ],
-            )
-          ],
-        )
+      padding: EdgeInsets.only(right: 40.0, left: 40.0),
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text('Желаемая дата получения', style: TextStyle(fontSize: 12.0, color: Colors.grey))
+            ]
+          ),
+          Row(
+            children: <Widget>[
+              Text(DateFormat.yMMMMd('ru').format(_deliveryDate)),
+              IconButton(
+                icon: Icon(
+                  Icons.calendar_today,
+                  size: 18.0
+                ),
+                onPressed: () async {
+                  DateTime newDate = await showDatePicker(
+                    context: context,
+                    initialDate: _today,
+                    firstDate: _today,
+                    lastDate: DateTime.now().add(Duration(days: 30)),
+                    selectableDayPredicate: (DateTime val) => _deliveryDates.any((deliveryDay) => deliveryDay == val)
+                  );
+                  if (newDate != null) {
+                    _deliveryDate = newDate;
+                  }
+                },
+              )
+            ],
+          )
+        ],
+      )
     );
   }
 
@@ -230,17 +220,87 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text('Адрес доставки', style: TextStyle(fontSize: 12.0, color: Colors.grey))
+              Text('Способ получения', style: _rowTextStyle)
             ]
           ),
           _buildDeliveryAddressDropdown(context),
-          _buildDeliveryAddressTextField(context)
-        ]
+          SizedBox(height: 8.0),
+          Row(
+            children: <Widget>[
+              Text('Адрес получения', style: _rowTextStyle)
+            ]
+          )
+        ]..addAll(_buildAddressSelect(context))..add(_buildNotesTextField(context))
       )
     );
   }
 
+  List<Widget> _buildAddressSelect(context) {
+    if (_deliveryAddress == null)
+      return [Container()];
+
+    if (_deliveryAddress.isPickup)
+      return [_buildPickupAddressDropdown(context)];
+
+    return [
+      _buildDeliveryAddressTextField(context),
+      _buildUserAddressDropdown(context)
+    ];
+  }
+
+  Widget _buildNotesTextField(context) {
+    TextEditingController controller = TextEditingController();
+    controller.text = _deliveryNotes;
+
+    return TextField(
+      controller: controller,
+      style: _defaultTextStyle,
+      onChanged: (String value) => _deliveryNotes = value,
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+        labelText: 'Комментарий',
+        labelStyle: _textFieldStyle
+      ),
+    );
+  }
+
+  Widget _buildPickupAddressDropdown(BuildContext context) {
+    return DropdownButton(
+      isExpanded: true,
+      onChanged: (String value) {
+        _deliveryAddressText = value;
+        setState(() {});
+      },
+      value: _deliveryAddressText,
+      items: _pickupAddresses.map((String address) {
+        return DropdownMenuItem<String>(
+          value: address,
+          child: Text(address, style: _defaultTextStyle)
+        );
+      }).toList()
+    );
+  }
+
   Widget _buildDeliveryAddressDropdown(BuildContext context) {
+    return DropdownButton(
+      isExpanded: true,
+      onChanged: (DeliveryAddress value) {
+        _deliveryAddress = value;
+        _deliveryAddressText = _deliveryAddress.isPickup ? _pickupAddresses.first : '';
+
+        setState(() {});
+      },
+      value: _deliveryAddress,
+      items: _deliveryAddresses.map((DeliveryAddress address) {
+        return DropdownMenuItem<DeliveryAddress>(
+          value: address,
+          child: Text(address.title, style: _defaultTextStyle)
+        );
+      }).toList()
+    );
+  }
+
+  Widget _buildUserAddressDropdown(BuildContext context) {
     List<UserAddress> addresses = User.currentUser.addresses;
 
     if (addresses.isEmpty) {
@@ -249,39 +309,23 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
 
     return DropdownButton(
       isExpanded: true,
-      onChanged: (String value) async {
-        if (value != null) {
-          _showDeliveryAddressTextField = false;
-          _manualDeliveryAddress = value;
-        } else {
-          _showDeliveryAddressTextField = true;
-          _manualDeliveryAddress = '';
-        }
-
-        _addressId = value;
-        await _updateDeliveryData();
+      onChanged: (UserAddress userAddress) async {
+        _deliveryAddressText = userAddress.address;
+        _userAddress = userAddress;
+        setState(() {});
       },
-      value: _addressId,
+      value: _userAddress,
       items: addresses.map((UserAddress userAddress) {
-        return DropdownMenuItem<String>(
-          value: userAddress.addressId,
+        return DropdownMenuItem<UserAddress>(
+          value: userAddress,
           child: Text(userAddress.address, style: _defaultTextStyle)
         );
-      }).toList()..add(
-        DropdownMenuItem<String>(
-          value: null,
-          child: Text('Другой адрес', style: _defaultTextStyle)
-        )
-      )
+      }).toList()
     );
   }
 
   Widget _buildDeliveryAddressTextField(BuildContext context) {
-    _deliveryAddressController.text = _manualDeliveryAddress;
-
-    if (!_showDeliveryAddressTextField) {
-      return Container();
-    }
+    _deliveryAddressController.text = _deliveryAddressText;
 
     return TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
@@ -293,7 +337,7 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
           padding: EdgeInsets.all(8.0),
           child: Text(
             'Произошла ошибка',
-            style: TextStyle(color: Theme.of(context).errorColor),
+            style: TextStyle(color: Theme.of(context).errorColor, fontSize: 14.0),
           ),
         );
       },
@@ -308,22 +352,20 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         );
       },
       suggestionsCallback: (String value) async {
-        Map<String, dynamic> res = await DadataApi.post(
-          'suggest/address',
+        List<dynamic> res = await Api.post(
+          'orderEditor/suggestAddress',
           body: {
-            'count': 5,
-            'locations_boost': [_currentLocation],
-            'query': value
-          });
-        return res['suggestions'];
+            'deliveryAddressText': value
+          }
+        );
+        return res;
       },
       itemBuilder: (BuildContext ctx, suggestion) {
         return ListTile(title: Text(suggestion['value'], style: Theme.of(context).textTheme.caption));
       },
       onSuggestionSelected: (suggestion) async {
         _deliveryAddressController.text = suggestion['value'];
-        _manualDeliveryAddress = _deliveryAddressController.text;
-        await _updateDeliveryData();
+        _deliveryAddressText = _deliveryAddressController.text;
         setState(() {});
       }
     );
@@ -352,7 +394,7 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
                   groupValue: _paymentType,
                   onChanged: _onPaymentTypeChange,
                 ),
-                Expanded(child: Text('Наличными', style: _defaultTextStyle))
+                Expanded(child: Text('Оплата наличными', style: _defaultTextStyle))
               ]
             )
           ),
@@ -367,7 +409,7 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
                   groupValue: _paymentType,
                   onChanged: _onPaymentTypeChange,
                 ),
-                Expanded(child: Text('Безналичный перевод', style: _defaultTextStyle))
+                Expanded(child: Text('Безналичный расчет', style: _defaultTextStyle))
               ]
             )
           ),
@@ -382,7 +424,7 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
                   groupValue: _paymentType,
                   onChanged: _onPaymentTypeChange,
                 ),
-                Expanded(child: Text('Банковская карта', style: _defaultTextStyle))
+                Expanded(child: Text('Оплата картой', style: _defaultTextStyle))
               ]
             )
           )
@@ -394,10 +436,10 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
   Widget _buildDeliveryListTile(BuildContext context) {
     if (_deliveryAddress != null) {
       return ListTile(
-        title: Text('Доставка на ${DateFormat.yMMMMd('ru').format(_deliveryAddress.date)}', style: _defaultTextStyle),
+        title: Text('Доставка ${DateFormat.yMMMMd('ru').format(_deliveryAddress.date)}', style: _defaultTextStyle),
         subtitle: Text(
-          _deliveryAddress.message,
-          style: TextStyle(color: Colors.grey, fontSize: 12.0)
+          _deliveryAddress.message ?? _deliveryAddressText,
+          style: _rowTextStyle
         ),
         trailing: Text(_deliveryAddress.deliveryCost.toStringAsFixed(2))
       );
@@ -430,11 +472,11 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
                 children: <TextSpan>[
                   TextSpan(
                     text: 'Цена: ${product.price.toStringAsFixed(2)}\n',
-                    style: TextStyle(color: Colors.grey, fontSize: 12.0)
+                    style: _rowTextStyle
                   ),
                   TextSpan(
                     text: 'Кол-во: ${product.quantity}',
-                    style: TextStyle(color: Colors.grey, fontSize: 12.0)
+                    style: _rowTextStyle
                   )
                 ]
               )
@@ -460,25 +502,44 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
     ];
   }
 
+  Future<void> _loadData() async {
+    try {
+      _deliveryDate = _today;
+      _deliveryDates = (await Api.get(
+        '/orderEditor/getDeliveryDates',
+        params: {
+          'guid': User.currentUser.lastDraft,
+          'deliveryDate': DateFormat('yyyy-MM-dd').format(DateTime.now())
+        }
+      )).map<DateTime>((val) => Nullify.parseDate(val)).toList();
+      _pickupAddresses = List<String>.from(await Api.get('/scripts/pickups.json'));
+      _deliveryAddresses = await DeliveryAddress.loadForDelivery(
+        User.currentUser.lastDraft,
+        _deliveryDate
+      );
+
+      if (User.currentUser.addresses.isNotEmpty) {
+        UserAddress userAddress = User.currentUser.addresses.first;
+
+        _deliveryAddressText = userAddress.address;
+        _userAddress = userAddress;
+        _name = userAddress.legalName;
+      }
+
+      if (_deliveryAddresses.isNotEmpty) _deliveryAddress = _deliveryAddresses.first;
+      if (_deliveryAddress != null && _deliveryAddress.isPickup) _deliveryAddressText = _pickupAddresses.first;
+
+      setState(() {});
+    } on ApiException catch(e) {
+      showMessage(e.errorMsg);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
-    DadataApi.get('detectAddressByIp').then((res) => _currentLocation = res['location']);
-
-    _deliveryDate = _today;
-
-    if (User.currentUser.addresses.isEmpty) {
-      _showDeliveryAddressTextField = true;
-    } else {
-      UserAddress userAddress = User.currentUser.addresses.first;
-
-      _showDeliveryAddressTextField = false;
-      _manualDeliveryAddress = userAddress.address;
-      _addressId = userAddress.addressId;
-      _name = userAddress.legalName;
-      _updateDeliveryData();
-    }
+    _loadData();
 
     _emailFocusNode.addListener(() async {
       _contactErrorText = null;
