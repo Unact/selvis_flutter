@@ -102,16 +102,12 @@ class User {
   Future<void> apiLogout() async {
     await Api.post('login/logout');
     reset();
-    await apiNewDraft();
+    await apiLastDraft();
     await save();
   }
 
   Future<void> apiRestorePassword(String login) async {
     await Api.post('login/restorePassword', params: {'username': login});
-  }
-
-  Future<void> apiNewDraft() async {
-    lastDraft = (await Api.post('orderEditor/newOrder'))['guid'];
   }
 
   Future<void> apiLastDraft() async {
