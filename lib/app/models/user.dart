@@ -111,7 +111,7 @@ class User {
   }
 
   Future<void> apiNewDraft() async {
-    lastDraft = await Api.post('orderEditor/newOrder');
+    lastDraft = (await Api.post('orderEditor/newOrder'))['guid'];
   }
 
   Future<void> apiLastDraft() async {
