@@ -194,13 +194,14 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
                 onPressed: () async {
                   DateTime newDate = await showDatePicker(
                     context: context,
-                    initialDate: _today,
+                    initialDate: _deliveryDate,
                     firstDate: _today,
                     lastDate: DateTime.now().add(Duration(days: 30)),
                     selectableDayPredicate: (DateTime val) => _deliveryDates.any((deliveryDay) => deliveryDay == val)
                   );
                   if (newDate != null) {
                     _deliveryDate = newDate;
+                    _updateDeliveryAddresses();
                   }
                 },
               )
@@ -269,6 +270,7 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
       isExpanded: true,
       onChanged: (String value) {
         _deliveryAddressText = value;
+
         setState(() {});
       },
       value: _deliveryAddressText,
@@ -502,6 +504,17 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
     ];
   }
 
+  Future<void> _updateDeliveryAddresses() async {
+    _deliveryAddresses = await DeliveryAddress.loadForDelivery(
+      User.currentUser.lastDraft,
+      _deliveryDate
+    );
+
+    if (_deliveryAddresses.isNotEmpty) _deliveryAddress = _deliveryAddresses.first;
+    if (_deliveryAddress != null && _deliveryAddress.isPickup) _deliveryAddressText = _pickupAddresses.first;
+    setState(() {});
+  }
+
   Future<void> _loadData() async {
     try {
       _deliveryDate = _today;
@@ -513,10 +526,6 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         }
       )).map<DateTime>((val) => Nullify.parseDate(val)).toList();
       _pickupAddresses = List<String>.from(await Api.get('/scripts/pickups.json'));
-      _deliveryAddresses = await DeliveryAddress.loadForDelivery(
-        User.currentUser.lastDraft,
-        _deliveryDate
-      );
 
       if (User.currentUser.addresses.isNotEmpty) {
         UserAddress userAddress = User.currentUser.addresses.first;
@@ -526,8 +535,9 @@ class _CompleteOrderPageState extends State<CompleteOrderPage> {
         _name = userAddress.legalName;
       }
 
-      if (_deliveryAddresses.isNotEmpty) _deliveryAddress = _deliveryAddresses.first;
-      if (_deliveryAddress != null && _deliveryAddress.isPickup) _deliveryAddressText = _pickupAddresses.first;
+      if (_deliveryDates.isNotEmpty) _deliveryDate = _deliveryDates.first;
+
+      await _updateDeliveryAddresses();
 
       setState(() {});
     } on ApiException catch(e) {
