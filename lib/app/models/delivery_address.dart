@@ -22,12 +22,13 @@ class DeliveryAddress {
   }
 
   static Future<List<DeliveryAddress>> loadForDelivery(String guid, DateTime date) async {
-    List<dynamic> res = (await Api.post(
+    List<Map<String, dynamic>> res = [];
+    (await Api.post(
       'orderEditor/getDeliveryVariants',
       params: {
         'guid': guid,
         'deliveryDate': DateFormat('yyyy-MM-dd').format(date)
-    })).first;
+    })).forEach((i) => i.forEach((j) => res.add(j)));
 
     return res.map<DeliveryAddress>((row) => DeliveryAddress(row)).toList();
   }
